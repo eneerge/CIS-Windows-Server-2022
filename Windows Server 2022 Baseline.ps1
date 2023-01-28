@@ -1738,6 +1738,12 @@ function DisableExceptionChainValidation {
     SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" "DisableExceptionChainValidation" "1" $REG_DWORD
 }
 
+function RestrictDriverInstallationToAdministrators {
+    #18.3.5 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\Limits print driver installation to Administrators
+    Write-Info "18.3.5 (L1) Ensure 'Limits print driver installation to Administrators' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "RestrictDriverInstallationToAdministrators " "1" $REG_DWORD
+}
+
 function WDigestUseLogonCredential   {
     #18.3.6 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\WDigest Authentication (disabling may require KB2871997)
     Write-Info "18.3.6 (L1) Ensure 'WDigest Authentication' is set to 'Disabled'"

@@ -6,6 +6,15 @@ Spreadsheet contains all CIS Recommendations without modifications. Some items r
 
 # Powershell Script
 Script is provided that implements all configurations (L1 and L2). Each configuration can be easily commented out if not required. Please review the spreadsheet to see if any additional setup is required for any particular configuration.
+To use:
+- Configure $NewLocalAdmin to the username you would like (script creates this user)
+- Inspect the script and enable/disable configurations you would like to implement (simply comment out any options to disable)
+- Open an admin powershell (64-bit) window and run
+- Script will inform you that a new admin user will be created
+- Enter a new admin password for that user
+- Reboot and login with your new admin user
+
+Parameters can also be read into the script if you prefer to run it that way.
 
 # Notes
 Windows Server on-premise machines can not currently be managed by Intune. If you have removed all Active Directory components from your environment as I have, one solution to ensure servers adhere to a baseline is to run a script to apply all of the configurations. My intention of this script is to set it up to be run automatically every day on the server to ensure it doesn't trickle away from the baseline. A couple things to note:

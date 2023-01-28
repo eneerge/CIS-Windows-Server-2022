@@ -1745,8 +1745,8 @@ function RestrictDriverInstallationToAdministrators {
 }
 
 function WDigestUseLogonCredential   {
-    #18.3.6 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\WDigest Authentication (disabling may require KB2871997)
-    Write-Info "18.3.6 (L1) Ensure 'WDigest Authentication' is set to 'Disabled'"
+    #18.3.7 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\WDigest Authentication (disabling may require KB2871997)
+    Write-Info "18.3.7 (L1) Ensure 'WDigest Authentication' is set to 'Disabled'"
     SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" "UseLogonCredential" "0" $REG_DWORD
 }
 

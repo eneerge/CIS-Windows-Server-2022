@@ -111,7 +111,7 @@ $ExecutionList = @(
     "DisableSmbUnencryptedPassword",                                    #2.3.8.3
     "IdleTimeSuspendingSession",                                        #2.3.9.1
     "NetworkServerAlwaysDigitallySign",                                 #2.3.9.2
-    "EnableSecuritySignature",                                          #2.3.9.3               -------------------------------- duplicate
+    "LanManSrvEnableSecuritySignature",                                 #2.3.9.3
     "LanManServerEnableForcedLogOff",                                   #2.3.9.4
     "LanManServerSmbServerNameHardeningLevel",                          #2.3.9.5
     "LSAAnonymousNameDisabled",                                         #2.3.10.1
@@ -1116,7 +1116,7 @@ function NetworkClientSignCommunications {
 function EnableSecuritySignature {
     #2.3.8.2 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Microsoft network client: Digitally sign communications (if server agrees)
     Write-Info "2.3.8.2 (L1) Ensure 'Microsoft network client: Digitally sign communications (if server agrees)' is set to 'Enabled' "
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\EnableSecuritySignature" (,"4,1")
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanWorkstation\Parameters" "EnableSecuritySignature" "1" $REG_DWORD
 }
 
 function DisableSmbUnencryptedPassword {
@@ -1140,7 +1140,7 @@ function NetworkServerAlwaysDigitallySign {
 function LanManSrvEnableSecuritySignature{
     #2.3.9.3 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Microsoft network server: Digitally sign communications (if client agrees)
     Write-Info "2.3.9.3 (L1) Ensure 'Microsoft network server: Digitally sign communications (if client agrees)' is set to 'Enabled'"
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\EnableSecuritySignature" (,"4,1")
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters" "EnableSecuritySignature" "1" $REG_DWORD
 }
 
 function LanManServerEnableForcedLogOff {

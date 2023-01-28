@@ -1744,6 +1744,12 @@ function RestrictDriverInstallationToAdministrators {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "RestrictDriverInstallationToAdministrators " "1" $REG_DWORD
 }
 
+function NetBIOSNodeType {
+    #18.3.6 => Navigate to the Registry path articulated in the Remediation section and confirm it is set as prescribed. 
+    Write-Info "18.3.6 (L1) Ensure 'NetBT NodeType configuration' is set to 'Enabled: P-node (recommended)'"
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" "NodeType" "2" $REG_DWORD
+}
+
 function WDigestUseLogonCredential   {
     #18.3.7 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\WDigest Authentication (disabling may require KB2871997)
     Write-Info "18.3.7 (L1) Ensure 'WDigest Authentication' is set to 'Disabled'"
@@ -1824,10 +1830,10 @@ function SecurityWarningLevel {
     SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\Eventlog\Security" "WarningLevel" "90" $REG_DWORD
 }
 
-function NetBIOSNodeType {
-    #18.3.6 => Navigate to the Registry path articulated in the Remediation section and confirm it is set as prescribed. 
-    Write-Info "18.3.6 (L1) Ensure 'NetBT NodeType configuration' is set to 'Enabled: P-node (recommended)'"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" "NodeType" "2" $REG_DWORD
+function EnableDNSOverDoH {
+    #18.5.4.1 => Computer Configuration\Policies\Administrative Templates\Network\DNS Client\Configure DNS over HTTPS (DoH) name resolution
+    Write-Info "18.5.4.1 (L1) Ensure 'Configure DNS over HTTPS (DoH) name resolution' is set to 'Enabled: Allow DoH' or higher"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient" "DoHPolicy" "3" $REG_DWORD
 }
 
 function EnableMulticast {

@@ -1825,8 +1825,8 @@ function SecurityWarningLevel {
 }
 
 function NetBIOSNodeType {
-    #18.5.4.1 => Navigate to the Registry path articulated in the Remediation section and confirm it is set as prescribed. 
-    Write-Info "18.5.4.1 (L1) Set 'NetBIOS node type' to 'P-node' (Ensure NetBT Parameter 'NodeType' is set to '0x2 (2)')"
+    #18.3.6 => Navigate to the Registry path articulated in the Remediation section and confirm it is set as prescribed. 
+    Write-Info "18.3.6 (L1) Ensure 'NetBT NodeType configuration' is set to 'Enabled: P-node (recommended)'"
     SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" "NodeType" "2" $REG_DWORD
 }
 

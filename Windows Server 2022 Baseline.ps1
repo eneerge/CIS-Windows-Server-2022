@@ -9,6 +9,9 @@ param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [st
 $LogonLegalNoticeMessageTitle = ""
 $LogonLegalNoticeMessage = ""
 
+# Set the max size of the windows firewall log in KB
+$WindowsFirewallLogSize = 4*1024*1024 # Default for script is 4GB
+
 $AdminAccountName = "Administrator" # Built-in admin account (disabled)
 $GuestAccountName = "NoGuest" # Build-in guest account (disabled)
 $NewLocalAdmin = "User" # Active admin account
@@ -154,8 +157,8 @@ $ExecutionList = @(
     "DomainDefaultInboundAction",                                       #9.1.2
     "DomainDefaultOutboundAction",                                      #9.1.3
     "DomainDisableNotifications",                                       #9.1.4
-    "DomainLogFilePath",                                                #9.1.5       ------------------------------------------------ review
-    "DomainLogFileSize",                                                #9.1.6       ------------------------------------------------ review
+    "DomainLogFilePath",                                                #9.1.5
+    "DomainLogFileSize",                                                #9.1.6
     "DomainLogDroppedPackets",                                          #9.1.7
     "DomainLogSuccessfulConnections",                                   #9.1.8
     "PrivateEnableFirewall",                                            #9.2.1
@@ -1402,7 +1405,7 @@ function DomainLogFilePath {
 function DomainLogFileSize {
     #9.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Windows Firewall with Advanced Security\Windows Firewall with Advanced Security\Windows Firewall Properties\Domain Profile\Logging Customize\Size limit (KB) 
     Write-Info "9.1.6 (L1) Ensure 'Windows Firewall: Domain: Logging: Size limit (KB)' is set to '16,384 KB or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging" "LogFileSize" "16384" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging" "LogFileSize" $WindowsFirewallLogSize $REG_DWORD
 }
 
 function DomainLogDroppedPackets {
@@ -1450,7 +1453,7 @@ function PrivateLogFilePath {
 function PrivateLogFileSize {
     #9.2.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Windows Firewall with Advanced Security\Windows Firewall with Advanced Security\Windows Firewall Properties\Private Profile\Logging Customize\Size limit (KB) 
     Write-Info "9.2.6 (L1) Ensure 'Windows Firewall: Private: Logging: Size limit (KB)' is set to '16,384 KB or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile\Logging" "LogFileSize" "16384" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile\Logging" "LogFileSize" $WindowsFirewallLogSize $REG_DWORD
 }
 
 function PrivateLogDroppedPackets {
@@ -1510,7 +1513,7 @@ function PublicLogFilePath {
 function PublicLogFileSize {
     #9.3.8 => Computer Configuration\Policies\Windows Settings\Security Settings\Windows Firewall with Advanced Security\Windows Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Logging Customize\Size limit (KB) 
     Write-Info "9.3.8 (L1) Ensure 'Windows Firewall: Public: Logging: Size limit (KB)' is set to '16,384 KB or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile\Logging" "LogFileSize" "16384" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile\Logging" "LogFileSize" $WindowsFirewallLogSize $REG_DWORD
 }
 
 function PublicLogDroppedPackets {

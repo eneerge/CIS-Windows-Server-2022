@@ -1,4 +1,4 @@
-﻿param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [string] $LegalNoticeMessageFile = "", [string] $ExecutionListFile = "")
+param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [string] $LegalNoticeMessageFile = "", [string] $ExecutionListFile = "")
 
 # CIS Microsoft Windows Server 2022 Benchmark based on https://workbench.cisecurity.org/benchmarks/8932
 # Script from https://github.com/eneerge/CIS-Windows-Server-2022
@@ -16,437 +16,406 @@ $NewLocalAdmin = "User" # Active admin account
 #IF YOU HAVE SPECIAL SECURITY REQUIREMENTS YOU CAN DISABLE POLICIES BELLOW
 $ExecutionList = @(
     #KEEP THESE IN THE BEGINING
-    "CreateNewLocalAdminAccount", #Mandatory otherwise the system access is lost
-    "RenameAdministratorAccount", #2.3.1.5 
-    "RenameGuestAccount",         #2.3.1.6
+    "CreateNewLocalAdminAccount",                                       #Mandatory otherwise the system access is lost
+    "RenameAdministratorAccount",                                       #2.3.1.5 
+    "RenameGuestAccount",                                               #2.3.1.6
     ###########################
-    "EnforcePasswordHistory", #1.1.1
-    "MaximumPasswordAge",     #1.1.2
-    "MinimumPasswordAge",     #1.1.3
-    "MinimumPasswordLength",  #1.1.4
-    "WindowsPasswordComplexityPolicyMustBeEnabled", #1.1.5
-    
-    "RelaxMinPasswordLength",#1.1.6 (2023.01.27)
-    
-    "DisablePasswordReversibleEncryption", #1.1.7 (2023.01.27 changed numbering from 1.1.6)
-    "AccountLockoutDuration",     #1.2.1
-    "AccountLockoutThreshold",    #1.2.2
-    "ResetAccountLockoutCounter", #1.2.3
-    "NoOneTrustCallerACM",        #2.2.1
-     #2.2.2 Not Applicable to Member Server
-    "AccessComputerFromNetwork",  #2.2.3
-    "NoOneActAsPartOfOperatingSystem", #2.2.4
-     #2.2.5 Not Applicable to Member Server
-    "AdjustMemoryQuotasForProcess",      #2.2.6
-    "AllowLogonLocallyToAdministrators", #2.2.7
-     #2.2.8 Not Applicable to Member Server
-    "LogonThroughRemoteDesktopServices", #2.2.9
-    "BackupFilesAndDirectories", #2.2.10
-    "ChangeSystemTime", #2.2.11
-    "ChangeTimeZone",   #2.2.12
-    "CreatePagefile",   #2.2.13
-    "NoOneCreateTokenObject", #2.2.14
-    "CreateGlobalObjects",    #2.2.15
-    "NoOneCreatesSharedObjects",#2.2.16
-     #2.2.17 Not Applicable to Member Server
-    "CreateSymbolicLinks", #2.2.18
-    "DebugPrograms", #2.2.19
-     #2.2.20 Not Applicable to Member Server
-    "DenyNetworkAccess",  #2.2.21
-    "DenyGuestBatchLogon", #2.2.22
-    "DenyGuestServiceLogon", #2.2.23
-    "DenyGuestLocalLogon", #2.2.24
+    "EnforcePasswordHistory",                                           #1.1.1
+    "MaximumPasswordAge",                                               #1.1.2
+    "MinimumPasswordAge",                                               #1.1.3
+    "MinimumPasswordLength",                                            #1.1.4
+    "WindowsPasswordComplexityPolicyMustBeEnabled",                     #1.1.5
+    "RelaxMinPasswordLength",                                           #1.1.6 (2023.01.27)
+    "DisablePasswordReversibleEncryption",                              #1.1.7 (2023.01.27 changed numbering from 1.1.6)
+    "AccountLockoutDuration",                                           #1.2.1
+    "AccountLockoutThreshold",                                          #1.2.2
+    "ResetAccountLockoutCounter",                                       #1.2.3
+    "NoOneTrustCallerACM",                                              #2.2.1
+    #2.2.2 Not Applicable to Member Server
+    "AccessComputerFromNetwork",                                        #2.2.3
+    "NoOneActAsPartOfOperatingSystem",                                  #2.2.4
+    #2.2.5 Not Applicable to Member Server
+    "AdjustMemoryQuotasForProcess",                                     #2.2.6
+    "AllowLogonLocallyToAdministrators",                                #2.2.7
+    #2.2.8 Not Applicable to Member Server
+    "LogonThroughRemoteDesktopServices",                                #2.2.9
+    "BackupFilesAndDirectories",                                        #2.2.10
+    "ChangeSystemTime",                                                 #2.2.11
+    "ChangeTimeZone",                                                   #2.2.12
+    "CreatePagefile",                                                   #2.2.13
+    "NoOneCreateTokenObject",                                           #2.2.14
+    "CreateGlobalObjects",                                              #2.2.15
+    "NoOneCreatesSharedObjects",                                        #2.2.16
+    #2.2.17 Not Applicable to Member Server
+    "CreateSymbolicLinks",                                              #2.2.18
+    "DebugPrograms",                                                    #2.2.19
+    #2.2.20 Not Applicable to Member Server
+    "DenyNetworkAccess",                                                #2.2.21
+    "DenyGuestBatchLogon",                                              #2.2.22
+    "DenyGuestServiceLogon",                                            #2.2.23
+    "DenyGuestLocalLogon",                                              #2.2.24
     #2.2.25 Not Applicable to Member Server
-    "DenyRemoteDesktopServiceLogon", #2.2.26
+    "DenyRemoteDesktopServiceLogon",                                    #2.2.26
     #2.2.27 Not Applicable to Member Server
-    "NoOneTrustedForDelegation",     #2.2.28
-    "ForceShutdownFromRemoteSystem", #2.2.29
-    "GenerateSecurityAudits", #2.2.30
+    "NoOneTrustedForDelegation",                                        #2.2.28
+    "ForceShutdownFromRemoteSystem",                                    #2.2.29
+    "GenerateSecurityAudits",                                           #2.2.30
     #2.2.31 Not Applicable to Member Server
-    "ImpersonateClientAfterAuthentication", #2.2.32
-    "IncreaseSchedulingPriority", #2.2.33
-    "LoadUnloadDeviceDrivers", #2.2.34
-    "NoOneLockPagesInMemory",  #2.2.35
+    "ImpersonateClientAfterAuthentication",                             #2.2.32
+    "IncreaseSchedulingPriority",                                       #2.2.33
+    "LoadUnloadDeviceDrivers",                                          #2.2.34
+    "NoOneLockPagesInMemory",                                           #2.2.35
     #2.2.36 Not Applicable to Member Server
     #2.2.37 Not Applicable to Member Server
-    "ManageAuditingAndSecurity", #2.2.38
-    "NoOneModifiesObjectLabel",  #2.2.39
-    "FirmwareEnvValues", #2.2.40
-    "VolumeMaintenance", #2.2.41
-    "ProfileSingleProcess", #2.2.42
-    "ProfileSystemPerformance", #2.2.43
-    "ReplaceProcessLevelToken", #2.2.44
-    "RestoreFilesDirectories",  #2.2.45
-    "SystemShutDown", #2.2.46
+    "ManageAuditingAndSecurity",                                        #2.2.38
+    "NoOneModifiesObjectLabel",                                         #2.2.39
+    "FirmwareEnvValues",                                                #2.2.40
+    "VolumeMaintenance",                                                #2.2.41
+    "ProfileSingleProcess",                                             #2.2.42
+    "ProfileSystemPerformance",                                         #2.2.43
+    "ReplaceProcessLevelToken",                                         #2.2.44
+    "RestoreFilesDirectories",                                          #2.2.45
+    "SystemShutDown",                                                   #2.2.46
     #2.2.47 Not Applicable to Member Server
-    "TakeOwnershipFiles", #2.2.48
-    "DisableAdministratorAccount", #2.3.1.1
-    "DisableMicrosoftAccounts",    #2.3.1.2
-    "DisableGuestAccount",         #2.3.1.3
-    "LimitBlankPasswordConsole",   #2.3.1.4
-    "AuditForceSubCategoryPolicy",  #2.3.2.1
-    "AuditForceShutdown", #2.3.2.2
-    "DevicesAdminAllowedFormatEject", #2.3.4.1
-    "PreventPrinterInstallation", #2.3.4.2
+    "TakeOwnershipFiles",                                               #2.2.48
+    "DisableAdministratorAccount",                                      #2.3.1.1
+    "DisableMicrosoftAccounts",                                         #2.3.1.2
+    "DisableGuestAccount",                                              #2.3.1.3
+    "LimitBlankPasswordConsole",                                        #2.3.1.4
+    "AuditForceSubCategoryPolicy",                                      #2.3.2.1
+    "AuditForceShutdown",                                               #2.3.2.2
+    "DevicesAdminAllowedFormatEject",                                   #2.3.4.1
+    "PreventPrinterInstallation",                                       #2.3.4.2
     #2.3.5.1 Not Applicable to Member Server
     #2.3.5.2 Not Applicable to Member Server
     #2.3.5.3 Not Applicable to Member Server
     #2.3.5.4 Not Applicable to Member Server (2023.01.27)
     #2.3.5.5 Not Applicable to Member Server (2023.01.27)
-    "SignEncryptAllChannelData", #2.3.6.1
-    "SecureChannelWhenPossible", #2.3.6.2
-    "DigitallySignChannelWhenPossible", #2.3.6.3
-    "EnableAccountPasswordChanges", #2.3.6.4
-    "MaximumAccountPasswordAge",    #2.3.6.5
-    "RequireStrongSessionKey",      #2.3.6.6
-    "RequireCtlAltDel",      #2.3.7.1
-    "DontDisplayLastSigned",  #2.3.7.2
-    "MachineInactivityLimit", #2.3.7.3
-    "LogonLegalNotice", #2.3.7.4
-    "LogonLegalNoticeTitle", #2.3.7.5
-    "PreviousLogonCache", #2.3.7.6
-    "PromptUserPassExpiration", #2.3.7.7
-    "RequireDomainControllerAuth", #2.3.7.8
-    "SmartCardRemovalBehaviour", #2.3.7.9
-    "NetworkClientSignCommunications", #2.3.8.1
-    "EnableSecuritySignature",         #2.3.8.2
-    "DisableSmbUnencryptedPassword",   #2.3.8.3
-    "IdleTimeSuspendingSession",        #2.3.9.1
-    "NetworkServerAlwaysDigitallySign", #2.3.9.2
-    "EnableSecuritySignature", #2.3.9.3               -------------------------------- duplicate
-    "LanManServerEnableForcedLogOff", #2.3.9.4
-    "LanManServerSmbServerNameHardeningLevel", #2.3.9.5
-    "LSAAnonymousNameDisabled", #2.3.10.1
-    "RestrictAnonymousSAM", #2.3.10.2
-    "RestrictAnonymous", #2.3.10.3
-    "DisableDomainCreds", #2.3.10.4
-    "EveryoneIncludesAnonymous", #2.3.10.5
+    "SignEncryptAllChannelData",                                        #2.3.6.1
+    "SecureChannelWhenPossible",                                        #2.3.6.2
+    "DigitallySignChannelWhenPossible",                                 #2.3.6.3
+    "EnableAccountPasswordChanges",                                     #2.3.6.4
+    "MaximumAccountPasswordAge",                                        #2.3.6.5
+    "RequireStrongSessionKey",                                          #2.3.6.6
+    "RequireCtlAltDel",                                                 #2.3.7.1
+    "DontDisplayLastSigned",                                            #2.3.7.2
+    "MachineInactivityLimit",                                           #2.3.7.3
+    "LogonLegalNotice",                                                 #2.3.7.4
+    "LogonLegalNoticeTitle",                                            #2.3.7.5
+    "PreviousLogonCache",                                               #2.3.7.6
+    "PromptUserPassExpiration",                                         #2.3.7.7
+    "RequireDomainControllerAuth",                                      #2.3.7.8
+    "SmartCardRemovalBehaviour",                                        #2.3.7.9
+    "NetworkClientSignCommunications",                                  #2.3.8.1
+    "EnableSecuritySignature",                                          #2.3.8.2
+    "DisableSmbUnencryptedPassword",                                    #2.3.8.3
+    "IdleTimeSuspendingSession",                                        #2.3.9.1
+    "NetworkServerAlwaysDigitallySign",                                 #2.3.9.2
+    "EnableSecuritySignature",                                          #2.3.9.3               -------------------------------- duplicate
+    "LanManServerEnableForcedLogOff",                                   #2.3.9.4
+    "LanManServerSmbServerNameHardeningLevel",                          #2.3.9.5
+    "LSAAnonymousNameDisabled",                                         #2.3.10.1
+    "RestrictAnonymousSAM",                                             #2.3.10.2
+    "RestrictAnonymous",                                                #2.3.10.3
+    "DisableDomainCreds",                                               #2.3.10.4
+    "EveryoneIncludesAnonymous",                                        #2.3.10.5
     #2.3.10.6 Not Applicable to Member Server
-    "NullSessionPipes", #2.3.10.7
-    "AllowedExactPaths", #2.3.10.8
-    "AllowedPaths", #2.3.10.9
-    "RestrictNullSessAccess", #2.3.10.10
-    "RestrictRemoteSAM", #2.3.10.11
-    "NullSessionShares", #2.3.10.12
-    "LsaForceGuest", #2.3.10.13
-    "LsaUseMachineId", #2.3.11.1
-    "AllowNullSessionFallback", #2.3.11.2
-    "AllowOnlineID", #2.3.11.3
-    "SupportedEncryptionTypes", #2.3.11.4
-    "NoLMHash", #2.3.11.5
-    "ForceLogoff", #2.3.11.6
-    "LmCompatibilityLevel", #2.3.11.7
-    "LDAPClientIntegrity", #2.3.11.8
-    "NTLMMinClientSec", #2.3.11.9
-    "NTLMMinServerSec", #2.3.11.10
-    "ShutdownWithoutLogon", #2.3.13.1
-    "ObCaseInsensitive", #2.3.15.1
-    "SessionManagerProtectionMode", #2.3.15.2
-    "FilterAdministratorToken", #2.3.17.1
-    "ConsentPromptBehaviorAdmin", #2.3.17.2
-    "ConsentPromptBehaviorUser", #2.3.17.3
-    "EnableInstallerDetection", #2.3.17.4
-    "EnableSecureUIAPaths", #2.3.17.5
-    "EnableLUA", #2.3.17.6
-    "PromptOnSecureDesktop", #2.3.17.7
-    "EnableVirtualization", #2.3.17.8
-
+    "NullSessionPipes",                                                 #2.3.10.7
+    "AllowedExactPaths",                                                #2.3.10.8
+    "AllowedPaths",                                                     #2.3.10.9
+    "RestrictNullSessAccess",                                           #2.3.10.10
+    "RestrictRemoteSAM",                                                #2.3.10.11
+    "NullSessionShares",                                                #2.3.10.12
+    "LsaForceGuest",                                                    #2.3.10.13
+    "LsaUseMachineId",                                                  #2.3.11.1
+    "AllowNullSessionFallback",                                         #2.3.11.2
+    "AllowOnlineID",                                                    #2.3.11.3
+    "SupportedEncryptionTypes",                                         #2.3.11.4
+    "NoLMHash",                                                         #2.3.11.5
+    "ForceLogoff",                                                      #2.3.11.6
+    "LmCompatibilityLevel",                                             #2.3.11.7
+    "LDAPClientIntegrity",                                              #2.3.11.8
+    "NTLMMinClientSec",                                                 #2.3.11.9
+    "NTLMMinServerSec",                                                 #2.3.11.10
+    "ShutdownWithoutLogon",                                             #2.3.13.1
+    "ObCaseInsensitive",                                                #2.3.15.1
+    "SessionManagerProtectionMode",                                     #2.3.15.2
+    "FilterAdministratorToken",                                         #2.3.17.1
+    "ConsentPromptBehaviorAdmin",                                       #2.3.17.2
+    "ConsentPromptBehaviorUser",                                        #2.3.17.3
+    "EnableInstallerDetection",                                         #2.3.17.4
+    "EnableSecureUIAPaths",                                             #2.3.17.5
+    "EnableLUA",                                                        #2.3.17.6
+    "PromptOnSecureDesktop",                                            #2.3.17.7
+    "EnableVirtualization",                                             #2.3.17.8
     #5.1 Not Applicable to Member Server (2023.01.27)
-    "DisableSpooler", #5.2 (2023.01.27)
-
-    "DomainEnableFirewall", #9.1.1
-    "DomainDefaultInboundAction", #9.1.2
-    "DomainDefaultOutboundAction", #9.1.3
-    "DomainDisableNotifications", #9.1.4
-    "DomainLogFilePath", #9.1.5       ------------------------------------------------ review
-    "DomainLogFileSize", #9.1.6       ------------------------------------------------ review
-    "DomainLogDroppedPackets", #9.1.7
-    "DomainLogSuccessfulConnections", #9.1.8
-
-    "PrivateEnableFirewall", #9.2.1
-    "PrivateDefaultInboundAction", #9.2.2
-    "PrivateDefaultOutboundAction", #9.2.3
-    "PrivateDisableNotifications", #9.2.4
-    "PrivateLogFilePath", #9.2.5
-    "PrivateLogFileSize", #9.2.6
-    "PrivateLogDroppedPackets", #9.2.7
-    "PrivateLogSuccessfulConnections", #9.2.8
-
-    "PublicEnableFirewall", #9.3.1
-    "PublicDefaultInboundAction", #9.3.2
-    "PublicDefaultOutboundAction", #9.3.3
-    "PublicDisableNotifications", #9.3.4
-    "PublicAllowLocalPolicyMerge", #9.3.5            -------------------- review
-    "PublicAllowLocalIPsecPolicyMerge", #9.3.6      -------------------- review
-    "PublicLogFilePath", #9.3.7
-    "PublicLogFileSize", #9.3.8
-    "PublicLogDroppedPackets", #9.3.9
-    "PublicLogSuccessfulConnections", #9.3.10
-    "AuditCredentialValidation", #17.1.1
-    
+    "DisableSpooler",                                                   #5.2 (2023.01.27)
+    "DomainEnableFirewall",                                             #9.1.1
+    "DomainDefaultInboundAction",                                       #9.1.2
+    "DomainDefaultOutboundAction",                                      #9.1.3
+    "DomainDisableNotifications",                                       #9.1.4
+    "DomainLogFilePath",                                                #9.1.5       ------------------------------------------------ review
+    "DomainLogFileSize",                                                #9.1.6       ------------------------------------------------ review
+    "DomainLogDroppedPackets",                                          #9.1.7
+    "DomainLogSuccessfulConnections",                                   #9.1.8
+    "PrivateEnableFirewall",                                            #9.2.1
+    "PrivateDefaultInboundAction",                                      #9.2.2
+    "PrivateDefaultOutboundAction",                                     #9.2.3
+    "PrivateDisableNotifications",                                      #9.2.4
+    "PrivateLogFilePath",                                               #9.2.5
+    "PrivateLogFileSize",                                               #9.2.6
+    "PrivateLogDroppedPackets",                                         #9.2.7
+    "PrivateLogSuccessfulConnections",                                  #9.2.8
+    "PublicEnableFirewall",                                             #9.3.1
+    "PublicDefaultInboundAction",                                       #9.3.2
+    "PublicDefaultOutboundAction",                                      #9.3.3
+    "PublicDisableNotifications",                                       #9.3.4
+    "PublicAllowLocalPolicyMerge",                                      #9.3.5            -------------------- review
+    "PublicAllowLocalIPsecPolicyMerge",                                 #9.3.6      -------------------- review
+    "PublicLogFilePath",                                                #9.3.7
+    "PublicLogFileSize",                                                #9.3.8
+    "PublicLogDroppedPackets",                                          #9.3.9
+    "PublicLogSuccessfulConnections",                                   #9.3.10
+    "AuditCredentialValidation",                                        #17.1.1
     #17.1.2 Not Applicable to Member Server (2023.01.27)
     #17.1.3 Not Applicable to Member Server (2023.01.27)
-
-    "AuditComputerAccountManagement", #17.2.1
+    "AuditComputerAccountManagement",                                   #17.2.1
     #17.2.2 Not Applicable to Member Server
     #17.2.3 Not Applicable to Member Server
     #17.2.4 Not Applicable to Member Server
-    "AuditSecurityGroupManagement", #17.2.5
-    "AuditUserAccountManagement", #17.2.6
-    "AuditPNPActivity", #17.3.1
-    "AuditProcessCreation", #17.3.2
+    "AuditSecurityGroupManagement",                                     #17.2.5
+    "AuditUserAccountManagement",                                       #17.2.6
+    "AuditPNPActivity",                                                 #17.3.1
+    "AuditProcessCreation",                                             #17.3.2
     #17.4.1 Not Applicable to Member Server
     #17.4.2 Not Applicable to Member Server
-    "AuditAccountLockout", #17.5.1
-    "AuditGroupMembership", #17.5.2
-    "AuditLogoff", #17.5.3
-    "AuditLogon", #17.5.4
-    "AuditOtherLogonLogoffEvents", #17.5.5
-    "AuditSpecialLogon", #17.5.6
-    "AuditDetailedFileShare", #17.6.1
-    "AuditFileShare", #17.6.2
-    "AuditOtherObjectAccessEvents", #17.6.3
-    "AuditRemovableStorage", #17.6.4
-    "AuditPolicyChange", #17.7.1
-    "AuditAuthenticationPolicyChange",  #17.7.2
-    "AuditAuthorizationPolicyChange",   #17.7.3
-    "AuditMPSSVCRuleLevelPolicyChange", #17.7.4
-    "AuditOtherPolicyChangeEvents", #17.7.5
-    "AuditSpecialLogon", #17.8.1
-	"AuditIPsecDriver", #17.9.1
-	"AuditOtherSystemEvents", #17.9.2
-	"AuditSecurityStateChange", #17.9.3
-	"AuditSecuritySystemExtension", #17.9.4
-	"AuditSystemIntegrity", #17.9.5
-	"PreventEnablingLockScreenCamera", #18.1.1.1
-	"PreventEnablingLockScreenSlideShow", #18.1.1.2
-	"DisallowUsersToEnableOnlineSpeechRecognitionServices", #18.1.2.2 (2023.01.27 - updated from 18.1.2.1)
-	"DisallowOnlineTips", #18.1.3
-    
+    "AuditAccountLockout",                                              #17.5.1
+    "AuditGroupMembership",                                             #17.5.2
+    "AuditLogoff",                                                      #17.5.3
+    "AuditLogon",                                                       #17.5.4
+    "AuditOtherLogonLogoffEvents",                                      #17.5.5
+    "AuditSpecialLogon",                                                #17.5.6
+    "AuditDetailedFileShare",                                           #17.6.1
+    "AuditFileShare",                                                   #17.6.2
+    "AuditOtherObjectAccessEvents",                                     #17.6.3
+    "AuditRemovableStorage",                                            #17.6.4
+    "AuditPolicyChange",                                                #17.7.1
+    "AuditAuthenticationPolicyChange",                                  #17.7.2
+    "AuditAuthorizationPolicyChange",                                   #17.7.3
+    "AuditMPSSVCRuleLevelPolicyChange",                                 #17.7.4
+    "AuditOtherPolicyChangeEvents",                                     #17.7.5
+    "AuditSpecialLogon",                                                #17.8.1
+    "AuditIPsecDriver",                                                 #17.9.1
+    "AuditOtherSystemEvents",                                           #17.9.2
+    "AuditSecurityStateChange",                                         #17.9.3
+    "AuditSecuritySystemExtension",                                     #17.9.4
+    "AuditSystemIntegrity",                                             #17.9.5
+    "PreventEnablingLockScreenCamera",                                  #18.1.1.1
+    "PreventEnablingLockScreenSlideShow",                               #18.1.1.2
+    "DisallowUsersToEnableOnlineSpeechRecognitionServices",             #18.1.2.2 (2023.01.27 - updated from 18.1.2.1)
+    "DisallowOnlineTips",                                               #18.1.3
     #18.2.1 to 18.2.6 is LAP Implementation. This script will not enable LAPs.
     # In lieu of Microsoft's LAPs, you can use: https://github.com/eneerge/NAble-LAPS-LocalAdmin-Password-Rotation
-	
-    "LocalAccountTokenFilterPolicy", #18.3.1
-	"ConfigureSMBv1ClientDriver", #18.3.2
-	"ConfigureSMBv1server", #18.3.3
-	"DisableExceptionChainValidation", #18.3.4
-	
-    "RestrictDriverInstallationToAdministrators", #18.3.5 (2023.01.27 - added support)
-
-    "NetBIOSNodeType", #18.3.6 (2023.01.27 - updated from 18.5.4.1)
-
-	"WDigestUseLogonCredential", #18.3.7 (2023.01.27 - updated from 18.3.6)
-	"WinlogonAutoAdminLogon", #18.4.1
-	"DisableIPv6SourceRouting", #18.4.2
-	"DisableIPv4SourceRouting", #18.4.3
-	"EnableICMPRedirect", #18.4.4
-	"TcpIpKeepAliveTime", #18.4.5
-	"NoNameReleaseOnDemand", #18.4.6
-	"PerformRouterDiscovery", #18.4.7
-	"SafeDllSearchMode", #18.4.8
-	"ScreenSaverGracePeriod", #18.4.9
-	"TcpMaxDataRetransmissionsV6", #18.4.10
-	"TcpMaxDataRetransmissions", #18.4.11
-	"SecurityWarningLevel", #18.4.12
-    
-    "EnableDNSOverDoH", #18.5.4.1 (2023.01.27 - added support)
-	
-    "EnableMulticast", #18.5.4.2
-	"EnableFontProviders", #18.5.5.1
-	"AllowInsecureGuestAuth", #18.5.8.1
-	"LLTDIODisabled", #18.5.9.1
-	"RSPNDRDisabled", #18.5.9.2
-	"PeernetDisabled", #18.5.10.2
-	"DisableNetworkBridges", #18.5.11.2
-	"ProhibitInternetConnectionSharing", #18.5.11.3
-	"StdDomainUserSetLocation", #18.5.11.4
-	"HardenedPaths", #18.5.14.1
-	"DisableIPv6DisabledComponents", #18.5.19.2.1
-	"DisableConfigurationWirelessSettings", #18.5.20.1
-	"ProhibitaccessWCNwizards", #18.5.20.2
-	"fMinimizeConnections", #18.5.21.1
-	"fBlockNonDomain", #18.5.21.2
-
-    "RegisterSpoolerRemoteRpcEndPoint", #18.6.1 (2023.01.27 - added support)
-    "PrinterNoWarningNoElevationOnInstall", #18.6.2 (2023.01.27 - added support)
-    "PrinterUpdatePromptSettings", #18.6.3 (2023.01.27 - added support)
-
-	"NoCloudApplicationNotification", #18.7.1.1
-	"ProcessCreationIncludeCmdLine", #18.8.3.1
-	"EncryptionOracleRemediation", #18.8.4.1
-	"AllowProtectedCreds", #18.8.4.2
-
-
-	"EnableVirtualizationBasedSecurity", #18.8.5.1
-	"RequirePlatformSecurityFeatures", #18.8.5.2
-	"HypervisorEnforcedCodeIntegrity", #18.8.5.3
-	"HVCIMATRequired", #18.8.5.4
-	"LsaCfgFlags", #18.8.5.5
-
+    "LocalAccountTokenFilterPolicy",                                    #18.3.1
+    "ConfigureSMBv1ClientDriver",                                       #18.3.2
+    "ConfigureSMBv1server",                                             #18.3.3
+    "DisableExceptionChainValidation",                                  #18.3.4
+    "RestrictDriverInstallationToAdministrators",                       #18.3.5 (2023.01.27 - added support)
+    "NetBIOSNodeType",                                                  #18.3.6 (2023.01.27 - updated from 18.5.4.1)
+    "WDigestUseLogonCredential",                                        #18.3.7 (2023.01.27 - updated from 18.3.6)
+    "WinlogonAutoAdminLogon",                                           #18.4.1
+    "DisableIPv6SourceRouting",                                         #18.4.2
+    "DisableIPv4SourceRouting",                                         #18.4.3
+    "EnableICMPRedirect",                                               #18.4.4
+    "TcpIpKeepAliveTime",                                               #18.4.5
+    "NoNameReleaseOnDemand",                                            #18.4.6
+    "PerformRouterDiscovery",                                           #18.4.7
+    "SafeDllSearchMode",                                                #18.4.8
+    "ScreenSaverGracePeriod",                                           #18.4.9
+    "TcpMaxDataRetransmissionsV6",                                      #18.4.10
+    "TcpMaxDataRetransmissions",                                        #18.4.11
+    "SecurityWarningLevel",                                             #18.4.12
+    "EnableDNSOverDoH",                                                 #18.5.4.1 (2023.01.27 - added support)
+    "EnableMulticast",                                                  #18.5.4.2
+    "EnableFontProviders",                                              #18.5.5.1
+    "AllowInsecureGuestAuth",                                           #18.5.8.1
+    "LLTDIODisabled",                                                   #18.5.9.1
+    "RSPNDRDisabled",                                                   #18.5.9.2
+    "PeernetDisabled",                                                  #18.5.10.2
+    "DisableNetworkBridges",                                            #18.5.11.2
+    "ProhibitInternetConnectionSharing",                                #18.5.11.3
+    "StdDomainUserSetLocation",                                         #18.5.11.4
+    "HardenedPaths",                                                    #18.5.14.1
+    "DisableIPv6DisabledComponents",                                    #18.5.19.2.1
+    "DisableConfigurationWirelessSettings",                             #18.5.20.1
+    "ProhibitaccessWCNwizards",                                         #18.5.20.2
+    "fMinimizeConnections",                                             #18.5.21.1
+    "fBlockNonDomain",                                                  #18.5.21.2
+    "RegisterSpoolerRemoteRpcEndPoint",                                 #18.6.1 (2023.01.27 - added support)
+    "PrinterNoWarningNoElevationOnInstall",                             #18.6.2 (2023.01.27 - added support)
+    "PrinterUpdatePromptSettings",                                      #18.6.3 (2023.01.27 - added support)
+    "NoCloudApplicationNotification",                                   #18.7.1.1
+    "ProcessCreationIncludeCmdLine",                                    #18.8.3.1
+    "EncryptionOracleRemediation",                                      #18.8.4.1
+    "AllowProtectedCreds",                                              #18.8.4.2
+    "EnableVirtualizationBasedSecurity",                                #18.8.5.1
+    "RequirePlatformSecurityFeatures",                                  #18.8.5.2
+    "HypervisorEnforcedCodeIntegrity",                                  #18.8.5.3
+    "HVCIMATRequired",                                                  #18.8.5.4
+    "LsaCfgFlags",                                                      #18.8.5.5
     #18.8.5.6 Not Applicable to Member Server (2023.01.27)
-    "ConfigureSystemGuardLaunch",#18.8.5.7 (2023.01.27 - renamed from 18.8.6.7)
-
-    "PreventDeviceMetadataFromNetwork", #18.8.7.2 (2023.01.27 - added support)
-
-	"DriverLoadPolicy", #18.8.14.1
-	"NoBackgroundPolicy", #18.8.21.2
-	"NoGPOListChanges", #18.8.21.3
-	"EnableCdp", #18.8.21.4
-	"DisableBkGndGroupPolicy", #18.8.21.5
-	"DisableWebPnPDownload", #18.8.22.1.1
-	"PreventHandwritingDataSharing", #18.8.22.1.2
-	"PreventHandwritingErrorReports", #18.8.22.1.3
-	"ExitOnMSICW", #18.8.22.1.4
-	"NoWebServices", #18.8.22.1.5
-	"DisableHTTPPrinting", #18.8.22.1.6
-	"NoRegistration", #18.8.22.1.7
-	"DisableContentFileUpdates", #18.8.22.1.8
-	"NoOnlinePrintsWizard", #18.8.22.1.9
-	"NoPublishingWizard", #18.8.22.1.10
-	"CEIP", #18.8.22.1.11
-	"CEIPEnable", #18.8.22.1.2
-	"TurnoffWindowsErrorReporting", #18.8.22.1.13
-	"SupportDeviceAuthenticationUsingCertificate", #18.8.25.1
-	"DeviceEnumerationPolicy", #18.8.26.1
-	"BlockUserInputMethodsForSignIn", #18.8.27.1
-	"BlockUserFromShowingAccountDetailsOnSignin", #18.8.28.1
-	"DontDisplayNetworkSelectionUI", #18.8.28.2
-	"DontEnumerateConnectedUsers", #18.8.28.3
-	"EnumerateLocalUsers", #18.8.28.4
-	"DisableLockScreenAppNotifications", #18.8.28.5
-	"BlockDomainPicturePassword", #18.8.28.6
-	"AllowDomainPINLogon", #18.8.28.7
-	"AllowCrossDeviceClipboard", #18.8.31.1
-	"UploadUserActivities", #18.8.31.2
-	"AllowNetworkBatteryStandby", #18.8.34.6.1
-	"AllowNetworkACStandby", #18.8.34.6.2
-	"RequirePasswordWakes", #18.8.34.6.3
-	"RequirePasswordWakesAC", #18.8.34.6.4
-	"fAllowUnsolicited", #18.8.36.1
-	"fAllowToGetHelp", #18.8.36.2
-	"EnableAuthEpResolution", #18.8.37.1 (2023.01.27 - mapping added)
-    "RestrictRemoteClients", #18.8.37.2 (2023.01.27 - added)
-
+    "ConfigureSystemGuardLaunch",                                       #18.8.5.7 (2023.01.27 - renamed from 18.8.6.7)
+    "PreventDeviceMetadataFromNetwork",                                 #18.8.7.2 (2023.01.27 - added support)
+    "DriverLoadPolicy",                                                 #18.8.14.1
+    "NoBackgroundPolicy",                                               #18.8.21.2
+    "NoGPOListChanges",                                                 #18.8.21.3
+    "EnableCdp",                                                        #18.8.21.4
+    "DisableBkGndGroupPolicy",                                          #18.8.21.5
+    "DisableWebPnPDownload",                                            #18.8.22.1.1
+    "PreventHandwritingDataSharing",                                    #18.8.22.1.2
+    "PreventHandwritingErrorReports",                                   #18.8.22.1.3
+    "ExitOnMSICW",                                                      #18.8.22.1.4
+    "NoWebServices",                                                    #18.8.22.1.5
+    "DisableHTTPPrinting",                                              #18.8.22.1.6
+    "NoRegistration",                                                   #18.8.22.1.7
+    "DisableContentFileUpdates",                                        #18.8.22.1.8
+    "NoOnlinePrintsWizard",                                             #18.8.22.1.9
+    "NoPublishingWizard",                                               #18.8.22.1.10
+    "CEIP",                                                             #18.8.22.1.11
+    "CEIPEnable",                                                       #18.8.22.1.2
+    "TurnoffWindowsErrorReporting",                                     #18.8.22.1.13
+    "SupportDeviceAuthenticationUsingCertificate",                      #18.8.25.1
+    "DeviceEnumerationPolicy",                                          #18.8.26.1
+    "BlockUserInputMethodsForSignIn",                                   #18.8.27.1
+    "BlockUserFromShowingAccountDetailsOnSignin",                       #18.8.28.1
+    "DontDisplayNetworkSelectionUI",                                    #18.8.28.2
+    "DontEnumerateConnectedUsers",                                      #18.8.28.3
+    "EnumerateLocalUsers",                                              #18.8.28.4
+    "DisableLockScreenAppNotifications",                                #18.8.28.5
+    "BlockDomainPicturePassword",                                       #18.8.28.6
+    "AllowDomainPINLogon",                                              #18.8.28.7
+    "AllowCrossDeviceClipboard",                                        #18.8.31.1
+    "UploadUserActivities",                                             #18.8.31.2
+    "AllowNetworkBatteryStandby",                                       #18.8.34.6.1
+    "AllowNetworkACStandby",                                            #18.8.34.6.2
+    "RequirePasswordWakes",                                             #18.8.34.6.3
+    "RequirePasswordWakesAC",                                           #18.8.34.6.4
+    "fAllowUnsolicited",                                                #18.8.36.1
+    "fAllowToGetHelp",                                                  #18.8.36.2
+    "EnableAuthEpResolution",                                           #18.8.37.1 (2023.01.27 - mapping added)
+    "RestrictRemoteClients",                                            #18.8.37.2 (2023.01.27 - added)
     #18.8.40.1 Not Applicable to Member Server (2023.01.27)
-    "DisableQueryRemoteServer", #18.8.48.5.1 (2023.01.27 - added to default configuration in script)
-    "ScenarioExecutionEnabled", #18.8.48.11.1 (2023.01.27 - added to default configuration in script)
-    "DisabledAdvertisingInfo", #18.8.50.1 (2023.01.27 - added to default configuration in script)
-    "NtpClientEnabled", #18.8.53.1.1 (2023.01.27 - added to default configuration in script)
-    "DisableWindowsNTPServer", #18.8.53.1.2 (2023.01.27 - added to default configuration in script)
-    "AllowSharedLocalAppData", #18.9.4.1 (2023.01.27 - added to default configuration in script)
-    "MSAOptional", #18.9.6.1 (2023.01.27 - added to default configuration in script)
-    "NoAutoplayfornonVolume", #18.9.8.1 (2023.01.27 - added to default configuration in script)
-    "NoAutorun", #18.9.8.2 (2023.01.27 - added to default configuration in script)
-    "NoDriveTypeAutoRun", #18.9.8.3 (2023.01.27 - added to default configuration in script)
-    "EnhancedAntiSpoofing", #18.9.10.1.1 (2023.01.27 - added to default configuration in script)
-    "DisallowCamera", #18.9.12.1 (2023.01.27 - added to default configuration in script)
-    "DisableConsumerAccountStateContent", #18.9.14.1 (2023.01.27 - added support)
-    "DisableWindowsConsumerFeatures", #18.9.14.2 (2023.01.27 - added to default configuration in script, renamed from 18.9.13.1)
-    "RequirePinForPairing", #18.9.15.1 (2023.01.27 - added to default configuration in script)
-    "DisablePasswordReveal", #18.9.16.1 (2023.01.27 - added to default configuration in script, renamed from 18.9.15.1)
-    "DisableEnumerateAdministrators", #18.9.16.2 (2023.01.27 - added to default configuration in script, renamed from 18.9.15.2)
-    "DisallowTelemetry", #18.9.17.1 (2023.01.27 - added to default configuration in script)
-    "DisableEnterpriseAuthProxy", #18.9.17.2 (2023.01.27 - added to default configuration in script)
-    "DisableOneSettingsDownloads", #18.9.17.3 (2023.01.27 - added support)
-    "DoNotShowFeedbackNotifications", #18.9.17.4 (2023.01.27 - added support)
-    "EnableOneSettingsAuditing", #18.9.17.5 (2023.01.27 - added support)
-    "LimitDiagnosticLogCollection", #18.9.17.6 (2023.01.27 - added support)
-    "LimitDumpCollection", #18.9.17.7 (2023.01.27 - added support)
-    "AllowBuildPreview", #18.9.17.8 (2023.01.27 - added to default configuration in script)
-    "EventLogRetention", #18.9.27.1.1 (2023.01.27 - added to default configuration in script and renamed)
-    "EventLogMaxSize", #18.9.27.1.2 (2023.01.27 - added to default configuration in script and renamed)
-    "EventLogSecurityRetention", #18.9.27.2.1 (2023.01.27 - added to default configuration in script and renamed)
-    "EventLogSecurityMaxSize", #18.9.27.2.2 (2023.01.27 - added to default configuration in script and renamed)
-    "EventLogSetupRetention", #18.9.27.3.1 (2023.01.27 - added to default configuration in script and renamed)
-    "EventLogSetupMaxSize", #18.9.27.3.2 (2023.01.27 - added to default configuration in script and renamed)    
-    "EventLogSystemRetention", #18.9.27.4.1 (2023.01.27 - added to default configuration in script and renamed)    
-    "EventLogSystemMaxSize", #18.9.27.4.2 (2023.01.27 - added to default configuration in script and renamed)
-    "NoDataExecutionPrevention", #18.9.31.2 (2023.01.27 - added to default configuration in script and renamed)
-    "NoHeapTerminationOnCorruption", #18.9.31.3 (2023.01.27 - added to default configuration in script and renamed)
-    "PreXPSP2ShellProtocolBehavior", #18.9.31.4 (2023.01.27 - added to default configuration in script and renamed)
-    "LocationAndSensorsDisableLocation", #18.9.41.1 (2023.01.27 - added to default configuration in script and renamed)
-    "MessagingAllowMessageSync", #18.9.45.1 (2023.01.27 - added to default configuration in script and renamed)
-    "MicrosoftAccountDisableUserAuth", #18.9.46.1 (2023.01.27 - added to default configuration in script and renamed)
-    "LocalSettingOverrideSpynetReporting", #18.9.47.4.1 (2023.01.27 - added to default configuration in script and renamed)
-    #"SpynetReporting", #18.9.47.4.2 (2023.01.27 - added to default configuration in script and renamed)
-    "ExploitGuard_ASR_Rules", #18.9.47.5.1.1 (2023.01.27 - added to default configuration in script and renamed)
- 
+    "DisableQueryRemoteServer",                                         #18.8.48.5.1 (2023.01.27 - added to default configuration in script)
+    "ScenarioExecutionEnabled",                                         #18.8.48.11.1 (2023.01.27 - added to default configuration in script)
+    "DisabledAdvertisingInfo",                                          #18.8.50.1 (2023.01.27 - added to default configuration in script)
+    "NtpClientEnabled",                                                 #18.8.53.1.1 (2023.01.27 - added to default configuration in script)
+    "DisableWindowsNTPServer",                                          #18.8.53.1.2 (2023.01.27 - added to default configuration in script)
+    "AllowSharedLocalAppData",                                          #18.9.4.1 (2023.01.27 - added to default configuration in script)
+    "MSAOptional",                                                      #18.9.6.1 (2023.01.27 - added to default configuration in script)
+    "NoAutoplayfornonVolume",                                           #18.9.8.1 (2023.01.27 - added to default configuration in script)
+    "NoAutorun",                                                        #18.9.8.2 (2023.01.27 - added to default configuration in script)
+    "NoDriveTypeAutoRun",                                               #18.9.8.3 (2023.01.27 - added to default configuration in script)
+    "EnhancedAntiSpoofing",                                             #18.9.10.1.1 (2023.01.27 - added to default configuration in script)
+    "DisallowCamera",                                                   #18.9.12.1 (2023.01.27 - added to default configuration in script)
+    "DisableConsumerAccountStateContent",                               #18.9.14.1 (2023.01.27 - added support)
+    "DisableWindowsConsumerFeatures",                                   #18.9.14.2 (2023.01.27 - added to default configuration in script, renamed from 18.9.13.1)
+    "RequirePinForPairing",                                             #18.9.15.1 (2023.01.27 - added to default configuration in script)
+    "DisablePasswordReveal",                                            #18.9.16.1 (2023.01.27 - added to default configuration in script, renamed from 18.9.15.1)
+    "DisableEnumerateAdministrators",                                   #18.9.16.2 (2023.01.27 - added to default configuration in script, renamed from 18.9.15.2)
+    "DisallowTelemetry",                                                #18.9.17.1 (2023.01.27 - added to default configuration in script)
+    "DisableEnterpriseAuthProxy",                                       #18.9.17.2 (2023.01.27 - added to default configuration in script)
+    "DisableOneSettingsDownloads",                                      #18.9.17.3 (2023.01.27 - added support)
+    "DoNotShowFeedbackNotifications",                                   #18.9.17.4 (2023.01.27 - added support)
+    "EnableOneSettingsAuditing",                                        #18.9.17.5 (2023.01.27 - added support)
+    "LimitDiagnosticLogCollection",                                     #18.9.17.6 (2023.01.27 - added support)
+    "LimitDumpCollection",                                              #18.9.17.7 (2023.01.27 - added support)
+    "AllowBuildPreview",                                                #18.9.17.8 (2023.01.27 - added to default configuration in script)
+    "EventLogRetention",                                                #18.9.27.1.1 (2023.01.27 - added to default configuration in script and renamed)
+    "EventLogMaxSize",                                                  #18.9.27.1.2 (2023.01.27 - added to default configuration in script and renamed)
+    "EventLogSecurityRetention",                                        #18.9.27.2.1 (2023.01.27 - added to default configuration in script and renamed)
+    "EventLogSecurityMaxSize",                                          #18.9.27.2.2 (2023.01.27 - added to default configuration in script and renamed)
+    "EventLogSetupRetention",                                           #18.9.27.3.1 (2023.01.27 - added to default configuration in script and renamed)
+    "EventLogSetupMaxSize",                                             #18.9.27.3.2 (2023.01.27 - added to default configuration in script and renamed)    
+    "EventLogSystemRetention",                                          #18.9.27.4.1 (2023.01.27 - added to default configuration in script and renamed)    
+    "EventLogSystemMaxSize",                                            #18.9.27.4.2 (2023.01.27 - added to default configuration in script and renamed)
+    "NoDataExecutionPrevention",                                        #18.9.31.2 (2023.01.27 - added to default configuration in script and renamed)
+    "NoHeapTerminationOnCorruption",                                    #18.9.31.3 (2023.01.27 - added to default configuration in script and renamed)
+    "PreXPSP2ShellProtocolBehavior",                                    #18.9.31.4 (2023.01.27 - added to default configuration in script and renamed)
+    "LocationAndSensorsDisableLocation",                                #18.9.41.1 (2023.01.27 - added to default configuration in script and renamed)
+    "MessagingAllowMessageSync",                                        #18.9.45.1 (2023.01.27 - added to default configuration in script and renamed)
+    "MicrosoftAccountDisableUserAuth",                                  #18.9.46.1 (2023.01.27 - added to default configuration in script and renamed)
+    "LocalSettingOverrideSpynetReporting",                              #18.9.47.4.1 (2023.01.27 - added to default configuration in script and renamed)
+    #"SpynetReporting",                                                 #18.9.47.4.2 (2023.01.27 - added to default configuration in script and renamed)
+    "ExploitGuard_ASR_Rules",                                           #18.9.47.5.1.1 (2023.01.27 - added to default configuration in script and renamed)
     # 18.9.47.5.1.2 - ASR Rules have been separated into different functions
-    "ConfigureASRrules", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockOfficeCommsChildProcess", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockOfficeCreateExeContent", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockObfuscatedScripts", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockOfficeInjectionIntoOtherProcess", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockAdobeReaderChildProcess", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockWin32ApiFromOfficeMacro", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockCredStealingFromLsass", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockCredStealingFromLsass", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockCredStealingFromLsass", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockJSVBSLaunchingExeContent", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockOfficeChildProcess", #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockPersistenceThroughWMI", #18.9.47.5.1.2 (2023.01.27 - added support)
-
-    "EnableNetworkProtection", #18.9.47.5.3.1 (2023.01.27 - added to default configuration in script)
-    "EnableFileHashComputationFeature", #18.9.47.6.1 (2023.01.27 - added support)
-    "DisableIOAVProtection", #18.9.47.9.1 (2023.01.27 - added support)
-    "DisableRealtimeMonitoring", #18.9.47.9.2 (2023.01.27 - added support)
-    "DisableBehaviorMonitoring", #18.9.47.9.2 (2023.01.27 - added support)
-    "DisableScriptScanning", #18.9.47.9.4 (2023.01.27 - added support)
-
-    "DisableGenericRePorts", #18.9.47.11.1 (2023.01.27 - added support)
-    
-    "DisableRemovableDriveScanning", #18.9.47.12.1 (2023.01.27 - added support)
-    "DisableEmailScanning", #18.9.47.12.2 (2023.01.27 - added support)
-
-    "OneDriveDisableFileSyncNGSC", #18.9.58.1 (2023.01.27 - added to default configuration)
-    
-    "DisablePushToInstall", #18.9.64.1 (2023.01.27 - added support)
-
-    "TerminalServicesDisablePasswordSaving", #18.9.65.2.2 (2023.01.27 - added to default configuration)
-    "fSingleSessionPerUser", #18.9.65.3.2.1 (2023.01.27 - added to default configuration)
-    "EnableUiaRedirection", #18.9.65.3.3.1 (2023.01.27 - added support)
-    "TerminalServicesfDisableCcm", #18.9.65.3.3.2 (2023.01.27 - added to default configuration)
-    "TerminalServicesfDisableCdm", #18.9.65.3.3.3 (2023.01.27 - added to default configuration)
-    "fDisableLocationRedir", #18.9.65.3.3.4 (2023.01.27 - added support)
-    "TerminalServicesfDisableLPT", #18.9.65.3.3.5 (2023.01.27 - added to default configuration)
-    "TerminalServicesfDisablePNPRedir", #18.9.65.3.3.6 (2023.01.27 - added to default configuration)
-    "TerminalServicesfPromptForPassword", #18.9.65.3.9.1 (2023.01.27 - added to default configuration)
-    "TerminalServicesfEncryptRPCTraffic", #18.9.65.3.9.2 (2023.01.27 - added to default configuration)
-    "TerminalServicesUserAuthentication", #18.9.65.3.9.4 (2023.01.27 - added to default configuration)
-    "TerminalServicesMinEncryptionLevel", #18.9.65.3.9.5 (2023.01.27 - added to default configuration, corrected min level value)
-    "TerminalServicesMaxIdleTime", #18.9.65.3.10.1 (2023.01.27 - added to default configuration)
-    "TerminalServicesMaxDisconnectionTime", #18.9.65.3.10.2 (2023.01.27 - added to default configuration)
-    "TerminalServicesDeleteTempDirsOnExit", #18.9.65.3.11.1 (2023.01.27 - added to default configuration, corrected reg value)
-    "TerminalServicesPerSessionTempDir", #18.9.65.3.11.2 (2023.01.27 - added to default configuration, corrected reg value)
-    "DisableEnclosureDownload", #18.9.66.1 (2023.01.27 - added to default configuration)
-    "WindowsSearchAllowCloudSearch", #18.9.67.2 (2023.01.27 - added to default configuration)
-    "AllowIndexingEncryptedStoresOrItems", #18.9.67.3 (2023.01.27 - added to default configuration)
-    "NoGenTicket", #18.9.72.1 (2023.01.27 - added to default configuration)
-    "DefenderSmartScreen", #18.9.85.1.1 (2023.01.27 - added to default configuration, corrected reg value)
-    "AllowSuggestedAppsInWindowsInkWorkspace", #18.9.89.1 (2023.01.27 - added to default configuration)
-    "AllowWindowsInkWorkspace", #18.9.89.2 (2023.01.27 - added to default configuration, corrected reg value)
-    "InstallerEnableUserControl", #18.9.90.1 (2023.01.27 - added to default configuration)
-    "InstallerAlwaysInstallElevated", #18.9.90.2 (2023.01.27 - added to default configuration)
-    "InstallerSafeForScripting", #18.9.90.3 (2023.01.27 - added to default configuration)
-    "DisableAutomaticRestartSignOn", #18.9.91.1 (2023.01.27 - added to default configuration, corrected reg value)
-    "EnableScriptBlockLogging", #18.9.100.1 (2023.01.27 - added to default configuration, corrected reg value)
-    "EnableTranscripting", #18.9.100.2 (2023.01.27 - added to default configuration)
-    "WinRMClientAllowBasic", #18.9.102.1.1 (2023.01.27 - added to default configuration)
-    "WinRMClientAllowUnencryptedTraffic", #18.9.102.1.2 (2023.01.27 - added to default configuration)
-    "WinRMClientAllowDigest", #18.9.102.1.3 (2023.01.27 - added to default configuration, corrected reg value)
-    
-    "WinRMServiceAllowBasic", #18.9.102.2.1 (2023.01.27 - added to default configuration)
-    "WinRMServiceAllowAutoConfig", #18.9.102.2.2 (2023.01.27 - added to default configuration)
-    "WinRMServiceAllowUnencryptedTraffic", #18.9.102.2.3 (2023.01.27 - added to default configuration)
-    "WinRMServiceDisableRunAs", #18.9.102.2.4 (2023.01.27 - added to default configuration)
-    "WinRSAllowRemoteShellAccess", #18.9.103.1 (2023.01.27 - added to default configuration)
-    "DisallowExploitProtectionOverride", #18.9.105.2.1 (2023.01.27 - added to default configuration)
-    "NoAutoRebootWithLoggedOnUsers", #18.9.108.1.1 (2023.01.27 - added to default configuration)
-    "ConfigureAutomaticUpdates", #18.9.108.2.1 (2023.01.27 - added to default configuration)
-    "Scheduledinstallday", #18.9.108.2.2 (2023.01.27 - added to default configuration)
-    "Managepreviewbuilds", #18.9.108.4.1 (2023.01.27 - added to default configuration, corrected reg value)
-    "WindowsUpdateFeature", #18.9.108.4.2 (2023.01.27 - added to default configuration)
-    "WindowsUpdateQuality" #18.9.108.4.3 (2023.01.27 - added to default configuration)
+    "ConfigureASRrules",                                                #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockOfficeCommsChildProcess",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockOfficeCreateExeContent",                      #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockObfuscatedScripts",                           #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockOfficeInjectionIntoOtherProcess",             #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockAdobeReaderChildProcess",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockWin32ApiFromOfficeMacro",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockJSVBSLaunchingExeContent",                    #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockOfficeChildProcess",                          #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockPersistenceThroughWMI",                       #18.9.47.5.1.2 (2023.01.27 - added support)
+    "EnableNetworkProtection",                                          #18.9.47.5.3.1 (2023.01.27 - added to default configuration in script)
+    "EnableFileHashComputationFeature",                                 #18.9.47.6.1 (2023.01.27 - added support)
+    "DisableIOAVProtection",                                            #18.9.47.9.1 (2023.01.27 - added support)
+    "DisableRealtimeMonitoring",                                        #18.9.47.9.2 (2023.01.27 - added support)
+    "DisableBehaviorMonitoring",                                        #18.9.47.9.2 (2023.01.27 - added support)
+    "DisableScriptScanning",                                            #18.9.47.9.4 (2023.01.27 - added support)
+    "DisableGenericRePorts",                                            #18.9.47.11.1 (2023.01.27 - added support)
+    "DisableRemovableDriveScanning",                                    #18.9.47.12.1 (2023.01.27 - added support)
+    "DisableEmailScanning",                                             #18.9.47.12.2 (2023.01.27 - added support)
+    "OneDriveDisableFileSyncNGSC",                                      #18.9.58.1 (2023.01.27 - added to default configuration)
+    "DisablePushToInstall",                                             #18.9.64.1 (2023.01.27 - added support)
+    "TerminalServicesDisablePasswordSaving",                            #18.9.65.2.2 (2023.01.27 - added to default configuration)
+    "fSingleSessionPerUser",                                            #18.9.65.3.2.1 (2023.01.27 - added to default configuration)
+    "EnableUiaRedirection",                                             #18.9.65.3.3.1 (2023.01.27 - added support)
+    "TerminalServicesfDisableCcm",                                      #18.9.65.3.3.2 (2023.01.27 - added to default configuration)
+    "TerminalServicesfDisableCdm",                                      #18.9.65.3.3.3 (2023.01.27 - added to default configuration)
+    "fDisableLocationRedir",                                            #18.9.65.3.3.4 (2023.01.27 - added support)
+    "TerminalServicesfDisableLPT",                                      #18.9.65.3.3.5 (2023.01.27 - added to default configuration)
+    "TerminalServicesfDisablePNPRedir",                                 #18.9.65.3.3.6 (2023.01.27 - added to default configuration)
+    "TerminalServicesfPromptForPassword",                               #18.9.65.3.9.1 (2023.01.27 - added to default configuration)
+    "TerminalServicesfEncryptRPCTraffic",                               #18.9.65.3.9.2 (2023.01.27 - added to default configuration)
+    "TerminalServicesUserAuthentication",                               #18.9.65.3.9.4 (2023.01.27 - added to default configuration)
+    "TerminalServicesMinEncryptionLevel",                               #18.9.65.3.9.5 (2023.01.27 - added to default configuration, corrected min level value)
+    "TerminalServicesMaxIdleTime",                                      #18.9.65.3.10.1 (2023.01.27 - added to default configuration)
+    "TerminalServicesMaxDisconnectionTime",                             #18.9.65.3.10.2 (2023.01.27 - added to default configuration)
+    "TerminalServicesDeleteTempDirsOnExit",                             #18.9.65.3.11.1 (2023.01.27 - added to default configuration, corrected reg value)
+    "TerminalServicesPerSessionTempDir",                                #18.9.65.3.11.2 (2023.01.27 - added to default configuration, corrected reg value)
+    "DisableEnclosureDownload",                                         #18.9.66.1 (2023.01.27 - added to default configuration)
+    "WindowsSearchAllowCloudSearch",                                    #18.9.67.2 (2023.01.27 - added to default configuration)
+    "AllowIndexingEncryptedStoresOrItems",                              #18.9.67.3 (2023.01.27 - added to default configuration)
+    "NoGenTicket",                                                      #18.9.72.1 (2023.01.27 - added to default configuration)
+    "DefenderSmartScreen",                                              #18.9.85.1.1 (2023.01.27 - added to default configuration, corrected reg value)
+    "AllowSuggestedAppsInWindowsInkWorkspace",                          #18.9.89.1 (2023.01.27 - added to default configuration)
+    "AllowWindowsInkWorkspace",                                         #18.9.89.2 (2023.01.27 - added to default configuration, corrected reg value)
+    "InstallerEnableUserControl",                                       #18.9.90.1 (2023.01.27 - added to default configuration)
+    "InstallerAlwaysInstallElevated",                                   #18.9.90.2 (2023.01.27 - added to default configuration)
+    "InstallerSafeForScripting",                                        #18.9.90.3 (2023.01.27 - added to default configuration)
+    "DisableAutomaticRestartSignOn",                                    #18.9.91.1 (2023.01.27 - added to default configuration, corrected reg value)
+    "EnableScriptBlockLogging",                                         #18.9.100.1 (2023.01.27 - added to default configuration, corrected reg value)
+    "EnableTranscripting",                                              #18.9.100.2 (2023.01.27 - added to default configuration)
+    "WinRMClientAllowBasic",                                            #18.9.102.1.1 (2023.01.27 - added to default configuration)
+    "WinRMClientAllowUnencryptedTraffic",                               #18.9.102.1.2 (2023.01.27 - added to default configuration)
+    "WinRMClientAllowDigest",                                           #18.9.102.1.3 (2023.01.27 - added to default configuration, corrected reg value)
+    "WinRMServiceAllowBasic",                                           #18.9.102.2.1 (2023.01.27 - added to default configuration)
+    "WinRMServiceAllowAutoConfig",                                      #18.9.102.2.2 (2023.01.27 - added to default configuration)
+    "WinRMServiceAllowUnencryptedTraffic",                              #18.9.102.2.3 (2023.01.27 - added to default configuration)
+    "WinRMServiceDisableRunAs",                                         #18.9.102.2.4 (2023.01.27 - added to default configuration)
+    "WinRSAllowRemoteShellAccess",                                      #18.9.103.1 (2023.01.27 - added to default configuration)
+    "DisallowExploitProtectionOverride",                                #18.9.105.2.1 (2023.01.27 - added to default configuration)
+    "NoAutoRebootWithLoggedOnUsers",                                    #18.9.108.1.1 (2023.01.27 - added to default configuration)
+    "ConfigureAutomaticUpdates",                                        #18.9.108.2.1 (2023.01.27 - added to default configuration)
+    "Scheduledinstallday",                                              #18.9.108.2.2 (2023.01.27 - added to default configuration)
+    "Managepreviewbuilds",                                              #18.9.108.4.1 (2023.01.27 - added to default configuration, corrected reg value)
+    "WindowsUpdateFeature",                                             #18.9.108.4.2 (2023.01.27 - added to default configuration)
+    "WindowsUpdateQuality"                                              #18.9.108.4.3 (2023.01.27 - added to default configuration)
     
     # These configurations references a user SID and are not automated in this script. (2023.01.27)
     #19.1.3.1

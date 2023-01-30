@@ -2015,6 +2015,12 @@ function ConfigureSystemGuardLaunch {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard" "ConfigureSystemGuardLaunch" "1" $REG_DWORD
 }
 
+function PreventDeviceMetadataFromNetwork {
+    #18.8.7.2 => Computer Configuration\Policies\Administrative Templates\System\Device Installation\Prevent device metadata retrieval from the Internet
+    Write-Info "18.8.7.2 (L1) Ensure 'Prevent device metadata retrieval from the Internet' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata" "PreventDeviceMetadataFromNetwork" "1" $REG_DWORD
+}
+
 function DriverLoadPolicy {
     #18.8.14.1 => Computer Configuration\Policies\Administrative Templates\System\Early Launch Antimalware\Boot-Start Driver Initialization Policy
     Write-Info "18.8.14.1 (L1) Ensure 'Boot-Start Driver Initialization Policy' is set to 'Enabled: Good, unknown and bad but critical'"

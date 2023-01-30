@@ -2396,7 +2396,7 @@ function LimitDumpCollection {
 }
 
 function AllowBuildPreview {
-    #18.9.16.4 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Toggle user control over Insider builds
+    #18.9.17.8 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Toggle user control over Insider builds
     Write-Info "18.9.17.8 (L1) Ensure 'Toggle user control over Insider builds' is set to 'Disabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds" "AllowBuildPreview" "0" $REG_DWORD
 }

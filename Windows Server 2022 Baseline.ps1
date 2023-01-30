@@ -2683,67 +2683,67 @@ function ExploitGuard_ASR_Rules {
 }
 
 function ConfigureASRrules {
-    #18.9.77.13.1.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Windows Defender Exploit Guard\Attack Surface Reduction\Configure Attack Surface Reduction rules: Set the state for each ASR rule
-    Write-Info "18.9.77.13.1.2 (L1) Ensure 'Configure Attack Surface Reduction rules: Set the state for each ASR rule' is 'configured'"    
+    #18.9.47.5.1.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Windows Defender Exploit Guard\Attack Surface Reduction\Configure Attack Surface Reduction rules: Set the state for each ASR rule
+    Write-Info "18.9.47.5.1.2 (L1) Ensure 'Configure Attack Surface Reduction rules: Set the state for each ASR rule' is 'configured'"    
 }
 
 function ConfigureASRRuleBlockOfficeCommsChildProcess {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block Office communication application from creating child processes"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block Office communication application from creating child processes"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "26190899-1602-49e8-8b27-eb1d0a1ce869" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockOfficeCreateExeContent {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block Office applications from creating executable content"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block Office applications from creating executable content"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "3b576869-a4ec-4529-8536-b80a7769e899" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockObfuscatedScripts {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block execution of potentially obfuscated scripts"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block execution of potentially obfuscated scripts"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "5beb7efe-fd9a-4556-801d-275e5ffc04cc" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockOfficeInjectionIntoOtherProcess {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block Office applications from injecting code into other processes"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block Office applications from injecting code into other processes"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "75668c1f-73b5-4cf0-bb93-3ecf5cb7cc84" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockAdobeReaderChildProcess {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block Adobe Reader from creating child processes"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block Adobe Reader from creating child processes"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "7674ba52-37eb-4a4f-a9a1-f0f9a1619a2c" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockWin32ApiFromOfficeMacro {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block Win32 API calls from Office macro"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block Win32 API calls from Office macro"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "92e97fa1-2edf-4476-bdd6-9dd0b4dddc7b" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockCredStealingFromLsass {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block credential stealing from the Windows local security authority subsystem (lsass.exe)"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block credential stealing from the Windows local security authority subsystem (lsass.exe)"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "9e6c4e1f-7d60-472f-ba1a-a39ef669e4b2" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockCredStealingFromLsass {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block untrusted and unsigned processes that run from USB"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block untrusted and unsigned processes that run from USB"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "b2b3f03d-6a65-4f7b-a9c7-1c7ef74a9ba4" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockCredStealingFromLsass {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block executable content from email client and webmail"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block executable content from email client and webmail"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "be9ba2d9-53ea-4cdc-84e5-9b1eeee46550" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockJSVBSLaunchingExeContent {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block JavaScript or VBScript from launching downloaded executable content"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block JavaScript or VBScript from launching downloaded executable content"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "d3e037e1-3eb8-44c8-a917-57927947596d" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockOfficeChildProcess {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block Office applications from creating child processes"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block Office applications from creating child processes"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "d4f940ab-401b-4efc-aadc-ad5f3c50688a" "1" $REG_SZ
 }
 
 function ConfigureASRRuleBlockPersistenceThroughWMI {
-    Write-Info "18.9.77.13.1.2 (L1) ASR Rule: Block persistence through WMI event subscription"
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block persistence through WMI event subscription"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "e6db77e5-3df2-4cf1-b95a-636979351e5b" "1" $REG_SZ
 }
 

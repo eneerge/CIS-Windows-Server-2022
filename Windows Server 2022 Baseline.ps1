@@ -2625,7 +2625,7 @@ function DisableGenericRePorts {
 
 function DisableRemovableDriveScanning {
     #18.9.47.12.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Scan\Scan removable drives
-    Write-Info "18.9.77.10.1 (L1) Ensure 'Scan removable drives' is set to 'Enabled'"
+    Write-Info "18.9.47.12.1 (L1) Ensure 'Scan removable drives' is set to 'Enabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Scan" "DisableRemovableDriveScanning" "0" $REG_DWORD
 }
 

@@ -2852,7 +2852,7 @@ function WinRMClientAllowBasic  {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client" "AllowBasic" "0" $REG_DWORD
 }
 
-function WinRMClientAllowBasic {
+function WinRMClientAllowUnencryptedTraffic {
     #18.9.102.1.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Remote Management (WinRM)\WinRM Client\Allow unencrypted traffic
     Write-Info "18.9.102.1.2 (L1) Ensure 'Allow unencrypted traffic' is set to 'Disabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client" "AllowUnencryptedTraffic" "0" $REG_DWORD

@@ -2742,6 +2742,12 @@ function DisableScriptScanning {
     SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableScriptScanning" "0" $REG_DWORD
 }
 
+function DisableGenericRePorts {
+    #18.9.47.11.1  => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\Reporting\Configure Watson events
+    Write-Info "18.9.47.11.1 (L2) Ensure 'Configure Watson events' is set to 'Disabled'"
+    SetRegistry "HKLM:SOFTWARE\SOFTWARE\Policies\Microsoft\Windows Defender\Reporting" "DisableGenericRePorts" "1" $REG_DWORD
+}
+
 function PUAProtection {
     #18.9.77.14 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Configure detection for potentially unwanted applications
     Write-Info "18.9.77.14 (L1) Ensure 'Configure detection for potentially unwanted applications' is set to 'Enabled: Block'"

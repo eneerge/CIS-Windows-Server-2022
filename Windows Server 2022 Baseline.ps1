@@ -2508,7 +2508,13 @@ function fSingleSessionPerUser {
     Write-Info "18.9.65.3.2.1 (L2) Ensure 'Restrict Remote Desktop Services users to a single Remote Desktop Services session' is set to 'Enabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fSingleSessionPerUser" "1" $REG_DWORD
 }
- 
+
+function EnableUiaRedirection {
+    #18.9.65.3.3.1 => Computer Configuration\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Allow UI Automation redirection
+    Write-Info "18.9.65.3.3.1 (L2) Ensure 'Allow UI Automation redirection' is set to 'Disabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "EnableUiaRedirection" "0" $REG_DWORD
+}
+
 function TerminalServicesfDisableCcm {
     #18.9.65.3.3.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow COM port redirection
     Write-Info "18.9.65.3.3.2 (L2) Ensure 'Do not allow COM port redirection' is set to 'Enabled'"
@@ -2519,6 +2525,12 @@ function TerminalServicesfDisableCdm {
     #18.9.65.3.3.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow drive redirection
     Write-Info "18.9.65.3.3.3 (L1) Ensure 'Do not allow drive redirection' is set to 'Enabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCdm" "1" $REG_DWORD
+}
+
+function fDisableLocationRedir {
+    #18.9.65.3.3.4 => Computer Configuration\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow location redirection
+    Write-Info "18.9.65.3.3.4 (L2) Ensure 'Do not allow location redirection' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableLocationRedir" "1" $REG_DWORD
 }
 
 function TerminalServicesfDisableLPT {

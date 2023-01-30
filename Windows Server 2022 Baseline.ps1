@@ -2712,11 +2712,28 @@ function ConfigureASRRuleBlockPersistenceThroughWMI {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "e6db77e5-3df2-4cf1-b95a-636979351e5b" "1" $REG_SZ
 }
 
-
 function EnableNetworkProtection {
     #18.9.47.5.3.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Windows Defender Exploit Guard\Network Protection\Prevent users and apps from accessing dangerous websites
     Write-Info "18.9.47.5.3.1 (L1) Ensure 'Prevent users and apps from accessing dangerous websites' is set to 'Enabled: Block'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\Network Protection" "EnableNetworkProtection" "1" $REG_DWORD
+}
+
+function EnableFileHashComputationFeature {
+    #18.9.47.6.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\MpEngine\Enable file hash computation feature
+    Write-Info "18.9.47.6.1 (L2) Ensure 'Enable file hash computation feature' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\MpEngine" "EnableFileHashComputation" "1" $REG_DWORD
+}
+
+function DisableIOAVProtection {
+    #18.9.47.9.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\Real-Time Protection\Scan all downloaded files and attachments
+    Write-Info "18.9.47.9.1 (L1) Ensure 'Scan all downloaded files and attachments' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableIOAVProtection" "0" $REG_DWORD
+}
+
+function DisableRealtimeMonitoring {
+    #18.9.47.9.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\Real-Time Protection\Scan all downloaded files and attachments
+    Write-Info "18.9.47.9.2 (L1) Ensure 'Turn off real-time protection' is set to 'Disabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableRealtimeMonitoring" "0" $REG_DWORD
 }
 
 function PUAProtection {

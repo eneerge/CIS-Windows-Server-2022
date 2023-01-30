@@ -2753,6 +2753,21 @@ function ConfigureASRRuleBlockPersistenceThroughWMI {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "e6db77e5-3df2-4cf1-b95a-636979351e5b" "1" $REG_SZ
 }
 
+function ConfigureASRRuleBlockExploitedSignedDrivers {
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block abuse of exploited vulnerable signed drivers (Not currently in CIS)"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "56a863a9-875e-4185-98a7-b882c64b5ce5" "1" $REG_SZ
+}
+
+function ConfigureASRRuleBlockExeUnlessMeetPrevalence {
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block executable files from running unless they meet a prevalence, age, or trusted list criterion (Not currently in CIS)"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "01443614-cd74-433a-b99e-2ecdc07bfc25" "1" $REG_SZ
+}
+
+function ConfigureASRRuleUseAdvancedRansomwareProtection {
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Use advanced protection against ransomware (Not currently in CIS)"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "c1db55ab-c21a-4637-bb3f-a12568109d35" "1" $REG_SZ
+}
+
 function EnableNetworkProtection {
     #18.9.47.5.3.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Windows Defender Exploit Guard\Network Protection\Prevent users and apps from accessing dangerous websites
     Write-Info "18.9.47.5.3.1 (L1) Ensure 'Prevent users and apps from accessing dangerous websites' is set to 'Enabled: Block'"

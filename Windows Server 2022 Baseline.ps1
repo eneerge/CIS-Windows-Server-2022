@@ -2383,6 +2383,18 @@ function EnableOneSettingsAuditing {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "EnableOneSettingsAuditing" "1" $REG_DWORD
 }
 
+function LimitDiagnosticLogCollection {
+    #18.9.17.6 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Limit Diagnostic Log Collection
+    Write-Info "18.9.17.6 (L1) Ensure 'Limit Diagnostic Log Collection' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "LimitDiagnosticLogCollection" "1" $REG_DWORD
+}
+
+function LimitDumpCollection {
+    #18.9.17.7 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Limit Dump Collection
+    Write-Info "18.9.17.7 (L1) Ensure 'Limit Dump Collection' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "LimitDumpCollection" "1" $REG_DWORD
+}
+
 function AllowBuildPreview {
     #18.9.16.4 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Toggle user control over Insider builds
     Write-Info "18.9.17.8 (L1) Ensure 'Toggle user control over Insider builds' is set to 'Disabled'"

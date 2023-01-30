@@ -1379,6 +1379,12 @@ function EnableVirtualization {
     SetSecurityPolicy "MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableVirtualization" (, "4,1")
 }
 
+function DisableSpooler {
+    #5.2 => Computer Configuration\Policies\Windows Settings\Security Settings\System Services\Print Spooler
+    Write-Info "5.2 (L2) Ensure 'Print Spooler (Spooler)' is set to 'Disabled' (MS only)"
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\Spooler" "Start" "4" $REG_DWORD
+}
+
 function DomainEnableFirewall {
     #9.1.1 => Computer Configuration\Policies\Windows Settings\Security Settings\Windows Firewall with Advanced Security\Windows Firewall with Advanced Security\Windows Firewall Properties\Domain Profile\Firewall state
     Write-Info "9.1.1 (L1) Ensure 'Windows Firewall: Domain: Firewall state' is set to 'On (recommended)'"

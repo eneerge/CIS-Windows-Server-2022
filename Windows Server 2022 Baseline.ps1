@@ -2513,7 +2513,7 @@ function DisablePushToInstall {
 function TerminalServicesDisablePasswordSaving {
     #18.9.65.2.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Connection Client\Do not allow passwords to be saved
     Write-Info "18.9.65.2.2 (L1) Ensure 'Do not allow passwords to be saved' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "DisablePasswordSaving" "1"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "DisablePasswordSaving" "1" $REG_DWORD
 }
 
 function fSingleSessionPerUser {

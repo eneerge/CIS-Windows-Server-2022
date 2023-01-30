@@ -2617,12 +2617,6 @@ function SpynetReporting {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" "SpynetReporting" "0" $REG_DWORD
 }
 
-function EnableBehaviorMonitoring {
-    #18.9.47.9.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Real-Time Protection\Turn on behavior monitoring 
-    Write-Info "18.9.47.9.3 (L1) Ensure 'Turn on behavior monitoring' is set to 'Enabled'"
-    SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableBehaviorMonitoring" "0" $REG_DWORD
-}
-
 function DisableGenericRePorts {
     #18.9.47.11.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Reporting\Configure Watson events
     Write-Info "18.9.47.11.1 (L2) Ensure 'Configure Watson events' is set to 'Disabled'"
@@ -2734,6 +2728,12 @@ function DisableRealtimeMonitoring {
     #18.9.47.9.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\Real-Time Protection\Scan all downloaded files and attachments
     Write-Info "18.9.47.9.2 (L1) Ensure 'Turn off real-time protection' is set to 'Disabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableRealtimeMonitoring" "0" $REG_DWORD
+}
+
+function DisableBehaviorMonitoring {
+    #18.9.47.9.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Real-Time Protection\Turn on behavior monitoring 
+    Write-Info "18.9.47.9.3 (L1) Ensure 'Turn on behavior monitoring' is set to 'Enabled'"
+    SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableBehaviorMonitoring" "0" $REG_DWORD
 }
 
 function PUAProtection {

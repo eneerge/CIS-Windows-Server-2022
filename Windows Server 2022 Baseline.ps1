@@ -373,7 +373,8 @@ $ExecutionList = @(
     "ConfigureASRRuleBlockExploitedSignedDrivers",                      #18.9.47.5.1.2 (2023.01.30 - added support)
     "ConfigureASRRuleBlockExeUnlessMeetPrevalence",                     #18.9.47.5.1.2 (2023.01.30 - added support)
     "ConfigureASRRuleUseAdvancedRansomwareProtection",                  #18.9.47.5.1.2 (2023.01.30 - added support)
-    
+    "ConfigureASRRuleBlockProcessesFromPSExecandWmi",                   #18.9.47.5.1.2 (2023.01.30 - added support)
+
     "EnableNetworkProtection",                                          #18.9.47.5.3.1 (2023.01.27 - added to default configuration in script)
     "EnableFileHashComputationFeature",                                 #18.9.47.6.1 (2023.01.27 - added support)
     "DisableIOAVProtection",                                            #18.9.47.9.1 (2023.01.27 - added support)
@@ -2767,6 +2768,11 @@ function ConfigureASRRuleBlockExeUnlessMeetPrevalence {
 function ConfigureASRRuleUseAdvancedRansomwareProtection {
     Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Use advanced protection against ransomware (Not currently in CIS)"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "c1db55ab-c21a-4637-bb3f-a12568109d35" "1" $REG_SZ
+}
+
+function ConfigureASRRuleBlockProcessesFromPSExecandWmi {
+    Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block process creations originating from PSExec and WMI commands (Not currently in CIS)"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "d1e49aac-8f56-4280-b9ba-993a6d77406c" "1" $REG_SZ
 }
 
 function EnableNetworkProtection {

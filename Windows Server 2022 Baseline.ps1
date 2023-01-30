@@ -742,10 +742,7 @@ function NoOneTrustCallerACM {
 function AccessComputerFromNetwork {
     #2.2.3 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access this computer from the network
     Write-Info "2.2.3 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users"
-    #SetUserRight "SeNetworkLogonRight" ($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
-    
-    #UMF Edit: Only allow administrators
-    SetUserRight "SeNetworkLogonRight" ($SID_ADMINISTRATORS)
+    SetUserRight "SeNetworkLogonRight" ($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
 }
 
 function NoOneActAsPartOfOperatingSystem {

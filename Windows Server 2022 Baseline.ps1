@@ -690,6 +690,14 @@ function WindowsPasswordComplexityPolicyMustBeEnabled
 
 }
 
+function RelaxMinPasswordLength
+{
+    #1.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Account Policies\Password Policy\Relax minimum password length limits
+    #1.1.6 (L1) Ensure 'Relax minimum password length limits' is set to 'Enabled'
+    Write-Info "1.1.6 (L1) Ensure 'Relax minimum password length limits' is set to 'Enabled'"
+    SetRegistry "HKLM:\System\CurrentControlSet\Control\SAM" "RelaxMinimumPasswordLengthLimits" "1" $REG_DWORD
+}
+
 function DisablePasswordReversibleEncryption {
 
     #1.1.6 (L1) Ensure 'Store passwords using reversible encryption' is set to 'Disabled' (Scored)

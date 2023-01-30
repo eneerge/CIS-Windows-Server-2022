@@ -9,8 +9,9 @@ param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [st
 $LogonLegalNoticeMessageTitle = ""
 $LogonLegalNoticeMessage = ""
 
-# Set the max size of the windows firewall log in KB
+# Set the max size of log files
 $WindowsFirewallLogSize = 4*1024*1024 # Default for script is 4GB
+$EventLogMaxFileSize = 4*1024*1024 # Default 4GB (for each log)
 
 $AdminAccountName = "Administrator" # Built-in admin account (disabled)
 $GuestAccountName = "NoGuest" # Build-in guest account (disabled)
@@ -2408,7 +2409,7 @@ function EventLogRetention  {
 function EventLogMaxSize {
     #18.9.27.1.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\Application\Specify the maximum log file size (KB)
     Write-Info "18.9.27.1.2 (L1) Ensure 'Application: Specify the maximum log file size (KB)' is set to 'Enabled: 32,768 or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application" "MaxSize" "32768" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application" "MaxSize" $EventLogMaxFileSize $REG_DWORD
 }
 
 function EventLogSecurityRetention {
@@ -2420,7 +2421,7 @@ function EventLogSecurityRetention {
 function EventLogSecurityMaxSize {
     #18.9.27.2.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\Security\Specify the maximum log file size (KB)
     Write-Info "18.9.27.2.2 (L1) Ensure 'Security: Specify the maximum log file size (KB)' is set to 'Enabled: 196,608 or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Security" "MaxSize" "196608" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Security" "MaxSize" $EventLogMaxFileSize $REG_DWORD
 }
 
 function EventLogSetupRetention {
@@ -2432,7 +2433,7 @@ function EventLogSetupRetention {
 function EventLogSetupMaxSize {
     #18.9.27.3.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\Setup\Specify the maximum log file size (KB)
     Write-Info "18.9.27.3.2 (L1) Ensure 'Setup: Specify the maximum log file size (KB)' is set to 'Enabled: 32,768 or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Setup" "MaxSize" "32768" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Setup" "MaxSize" $EventLogMaxFileSize $REG_DWORD
 }
 
 function EventLogSystemRetention {
@@ -2444,7 +2445,7 @@ function EventLogSystemRetention {
 function EventLogSystemMaxSize {
     #18.9.26.4.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\System\Specify the maximum log file size (KB)
     Write-Info "18.9.26.4.2 (L1) Ensure 'System: Specify the maximum log file size (KB)' is set to 'Enabled: 32,768 or greater'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\System" "MaxSize" "32768" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\System" "MaxSize" $EventLogMaxFileSize $REG_DWORD
 }
 
 function NoDataExecutionPrevention {

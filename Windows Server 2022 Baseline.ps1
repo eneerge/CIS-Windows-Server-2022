@@ -2736,6 +2736,12 @@ function DisableBehaviorMonitoring {
     SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableBehaviorMonitoring" "0" $REG_DWORD
 }
 
+function DisableScriptScanning {
+    #18.9.47.9.4 => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\Real-Time Protection\Turn on script scanning
+    Write-Info "18.9.47.9.4 (L1) Ensure 'Turn on script scanning' is set to 'Enabled'"
+    SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" "DisableScriptScanning" "0" $REG_DWORD
+}
+
 function PUAProtection {
     #18.9.77.14 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Configure detection for potentially unwanted applications
     Write-Info "18.9.77.14 (L1) Ensure 'Configure detection for potentially unwanted applications' is set to 'Enabled: Block'"

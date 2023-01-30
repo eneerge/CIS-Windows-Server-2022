@@ -2330,7 +2330,7 @@ function NoAutorun {
 function NoDriveTypeAutoRun {
     #18.9.8.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\AutoPlay Policies\Turn off Autoplay
     Write-Info "18.9.8.3 (L1) Ensure 'Turn off Autoplay' is set to 'Enabled: All drives'"
-    SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoDriveTypeAutoRun" "1" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoDriveTypeAutoRun" "255" $REG_DWORD
 }
 
 function EnhancedAntiSpoofing {

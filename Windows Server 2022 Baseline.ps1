@@ -646,9 +646,10 @@ function EnforcePasswordHistory
 
 function MaximumPasswordAge
 {
-    #1.1.2 (L1) Ensure 'Maximum password age' is set to '60 or fewer days, but not 0' (Scored)
-    Write-Info "1.1.2 (L1) Ensure 'Maximum password age' is set to '60 or fewer days, but not 0' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+    #1.1.2 => Computer Configuration\Policies\Windows Settings\Security Settings\Account Policies\Password Policy\Maximum password age
+    #1.1.2 (L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0'
+    Write-Info "(L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0'"
+    Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Maximum password age' )
     Write-After ("After hardening: *******                   ")
     net accounts /maxpwage:60

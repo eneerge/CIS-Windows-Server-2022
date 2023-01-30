@@ -368,6 +368,12 @@ $ExecutionList = @(
     "ConfigureASRRuleBlockJSVBSLaunchingExeContent",                    #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockOfficeChildProcess",                          #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockPersistenceThroughWMI",                       #18.9.47.5.1.2 (2023.01.27 - added support)
+    
+    # Not in CIS, but recommended
+    "ConfigureASRRuleBlockExploitedSignedDrivers",                      #18.9.47.5.1.2 (2023.01.30 - added support)
+    "ConfigureASRRuleBlockExeUnlessMeetPrevalence",                     #18.9.47.5.1.2 (2023.01.30 - added support)
+    "ConfigureASRRuleUseAdvancedRansomwareProtection",                  #18.9.47.5.1.2 (2023.01.30 - added support)
+    
     "EnableNetworkProtection",                                          #18.9.47.5.3.1 (2023.01.27 - added to default configuration in script)
     "EnableFileHashComputationFeature",                                 #18.9.47.6.1 (2023.01.27 - added support)
     "DisableIOAVProtection",                                            #18.9.47.9.1 (2023.01.27 - added support)

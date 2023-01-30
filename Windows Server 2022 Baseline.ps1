@@ -2365,10 +2365,22 @@ function DisableEnterpriseAuthProxy {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "DisableEnterpriseAuthProxy" "1" $REG_DWORD
 }
 
+function DisableOneSettingsDownloads {
+    #18.9.17.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Disable OneSettings Downloads
+    Write-Info "18.9.17.3 (L1) Ensure 'Disable OneSettings Downloads' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "DisableOneSettingsDownloads" "1" $REG_DWORD
+}
+
 function DoNotShowFeedbackNotifications {
-    #18.9.16.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Do not show feedback notifications
+    #18.9.17.4 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Do not show feedback notifications
     Write-Info "18.9.17.4 (L1) Ensure 'Do not show feedback notifications' is set to 'Enabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "DoNotShowFeedbackNotifications" "1" $REG_DWORD
+}
+
+function EnableOneSettingsAuditing {
+    #18.9.17.5 => Computer Configuration\Policies\Administrative Templates\Windows Components\Data Collection and Preview Builds\Enable OneSettings Auditing
+    Write-Info "18.9.17.5 (L1) Ensure 'Enable OneSettings Auditing' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" "EnableOneSettingsAuditing" "1" $REG_DWORD
 }
 
 function AllowBuildPreview {

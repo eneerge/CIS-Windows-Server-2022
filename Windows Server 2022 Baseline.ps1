@@ -17,6 +17,9 @@ $AdminAccountName = "Administrator" # Built-in admin account (disabled)
 $GuestAccountName = "NoGuest" # Build-in guest account (disabled)
 $NewLocalAdmin = "User" # Active admin account
 
+# Compatibility Assurance
+$AllowRDPClipboard = $false; # To share clipboard "TerminalServicesfDisableCdm" must be set to 0. CIS recommends it be set to 1. If this is true, the TerminalServicesfDisableCdm will not be enabled even if it's in the execution list. A CIS audit will report TerminalServicesfDisableCdm as not being implemented.
+
 #IF YOU HAVE SPECIAL SECURITY REQUIREMENTS YOU CAN DISABLE POLICIES BELLOW
 $ExecutionList = @(
     #KEEP THESE IN THE BEGINING
@@ -2536,8 +2539,15 @@ function TerminalServicesfDisableCcm {
 
 function TerminalServicesfDisableCdm {
     #18.9.65.3.3.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow drive redirection
-    Write-Info "18.9.65.3.3.3 (L1) Ensure 'Do not allow drive redirection' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCdm" "1" $REG_DWORD
+    # This prevents copying and pasting into RDP. Set to 0 to allow pasting into the RDP session.
+    if ($AllowRDPClipboard -eq $false) {
+      Write-Info "18.9.65.3.3.3 (L1) Ensure 'Do not allow drive redirection' is set to 'Enabled'"
+      SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCdm" "1" $REG_DWORD
+    }
+    else {
+      Write-Red "Skipping 18.9.65.3.3.3 (L1) Ensure 'Do not allow drive redirection' is set to 'Enabled'"
+      Write-Red '- You enabled $AllowRDPClipboard. This CIS configuration has been skipped so that the clipboard can be used.'
+    }
 }
 
 function fDisableLocationRedir {

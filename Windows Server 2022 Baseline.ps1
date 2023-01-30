@@ -2491,6 +2491,12 @@ function OneDriveDisableFileSyncNGSC {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive" "DisableFileSyncNGSC" "1" $REG_DWORD
 }
 
+function DisablePushToInstall {
+    #18.9.64.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Push to Install\Turn off Push To Install service
+    Write-Info "18.9.64.1 (L2) Ensure 'Turn off Push To Install service' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\PushToInstall" "DisablePushToInstall" "1" $REG_DWORD
+}
+
 function TerminalServicesDisablePasswordSaving {
     #18.9.65.2.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Connection Client\Do not allow passwords to be saved
     Write-Info "18.9.65.2.2 (L1) Ensure 'Do not allow passwords to be saved' is set to 'Enabled'"

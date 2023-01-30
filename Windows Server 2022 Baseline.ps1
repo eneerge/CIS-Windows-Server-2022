@@ -1937,6 +1937,24 @@ function fBlockNonDomain {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy" "fBlockNonDomain" "1" $REG_DWORD
 }
 
+function RegisterSpoolerRemoteRpcEndPoint {
+    #18.6.1 => Computer Configuration\Policies\Administrative Templates\Printers:Allow Print Spooler to accept client connections
+    Write-Info "18.6.1 (L1) Ensure 'Allow Print Spooler to accept client connections' is set to 'Disabled'"
+    SetRegistry "HKLM:\Software\Policies\Microsoft\Windows NT\Printers" "RegisterSpoolerRemoteRpcEndPoint" "2" $REG_DWORD
+}
+
+function PrinterNoWarningNoElevationOnInstall {
+    #18.6.2 => Computer Configuration\Policies\Administrative Templates\Printers\Point and Print Restrictions: When installing drivers for a new connection 
+    Write-Info "18.6.2 (L1) Ensure 'Point and Print Restrictions: When installing drivers for a new connection' is set to 'Enabled: Show warning and elevation prompt'"
+    SetRegistry "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "NoWarningNoElevationOnInstall" "0" $REG_DWORD
+}
+
+function PrinterUpdatePromptSettings {
+    #18.6.3 => Computer Configuration\Policies\Administrative Templates\Printers\Point and Print Restrictions: When updating drivers for an existing connection 
+    Write-Info "18.6.3 (L1) Ensure 'Point and Print Restrictions: When updating drivers for an existing connection' is set to 'Enabled: Show warning and elevation prompt'"
+    SetRegistry "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "NoWarningNoElevationOnInstall" "0" $REG_DWORD
+}
+
 function NoCloudApplicationNotification {
     #18.7.1.1 => Computer Configuration\Policies\Administrative Templates\Start Menu and Taskbar\Turn off notifications network usage
     Write-Info "18.7.1.1 (L2) Ensure 'Turn off notifications network usage' is set to 'Enabled'"

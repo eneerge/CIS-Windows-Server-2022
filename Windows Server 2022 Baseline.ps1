@@ -363,8 +363,8 @@ $ExecutionList = @(
     "ConfigureASRRuleBlockAdobeReaderChildProcess",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockWin32ApiFromOfficeMacro",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockUntrustedUnsignedProcessesUSB",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockExeutablesFromEmails",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockJSVBSLaunchingExeContent",                    #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockOfficeChildProcess",                          #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockPersistenceThroughWMI",                       #18.9.47.5.1.2 (2023.01.27 - added support)
@@ -2724,7 +2724,7 @@ function ConfigureASRRuleBlockWin32ApiFromOfficeMacro {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "92e97fa1-2edf-4476-bdd6-9dd0b4dddc7b" "1" $REG_SZ
 }
 
-function ConfigureASRRuleBlockCredStealingFromLsass {
+function ConfigureASRRuleBlockUntrustedUnsignedProcessesUSB {
     Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block credential stealing from the Windows local security authority subsystem (lsass.exe)"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "9e6c4e1f-7d60-472f-ba1a-a39ef669e4b2" "1" $REG_SZ
 }
@@ -2734,7 +2734,7 @@ function ConfigureASRRuleBlockCredStealingFromLsass {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "b2b3f03d-6a65-4f7b-a9c7-1c7ef74a9ba4" "1" $REG_SZ
 }
 
-function ConfigureASRRuleBlockCredStealingFromLsass {
+function ConfigureASRRuleBlockExeutablesFromEmails {
     Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block executable content from email client and webmail"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "be9ba2d9-53ea-4cdc-84e5-9b1eeee46550" "1" $REG_SZ
 }

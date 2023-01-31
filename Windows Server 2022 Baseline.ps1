@@ -30,7 +30,8 @@ $AdditionalUsersToDenyRemoteDesktopServiceLogon = @(  #CIS 2.2.26 - This adds ad
   ,"batchadmin"
 )
 $AdditionalUsersToDenyLocalLogon = @(         #CIS 2.2.24 - This adds additional users to the "Deny log on locally" if you want to exclude more than just the "guest" user.
-
+  "batchuser"
+  ,"batchadmin"
 )
 
 #IF YOU HAVE SPECIAL SECURITY REQUIREMENTS YOU CAN DISABLE POLICIES BELLOW
@@ -888,7 +889,14 @@ function DenyGuestServiceLogon {
 function DenyGuestLocalLogon {
     #2.2.24 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on locally
     Write-Info "2.2.24 (L1) Ensure 'Deny log on locally' to include 'Guests'"
-    SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS)
+    #SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS)
+
+    $addlDenyUsers = @()
+    if ($AdditionalUsersToDenyLocalLogon.Count -gt 0) {
+      $addlDenyUsers = $AdditionalUsersToDenyLocalLogon -join ","
+    }
+
+    SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS,$addlDenyUsers)
 }
 
 function DenyRemoteDesktopServiceLogon {

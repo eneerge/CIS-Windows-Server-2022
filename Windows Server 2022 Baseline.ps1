@@ -20,6 +20,7 @@ $NewLocalAdmin = "User" # Active admin account
 # Compatibility Assurance / Exceptions / Additional Configurations
 $AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments.
 $AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - This enables "Drive Redirection" feature (TerminalServicesfDisableCdm) so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
+$AllowDefenderMAPS = $true;                   # CIS 18.9.47.4.2 - CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation.
 
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
   "batchuser" # you can remove this since it's just an example
@@ -365,7 +366,7 @@ $ExecutionList = @(
     "MessagingAllowMessageSync",                                        #18.9.45.1 (2023.01.27 - added to default configuration in script and renamed)
     "MicrosoftAccountDisableUserAuth",                                  #18.9.46.1 (2023.01.27 - added to default configuration in script and renamed)
     "LocalSettingOverrideSpynetReporting",                              #18.9.47.4.1 (2023.01.27 - added to default configuration in script and renamed)
-    #"SpynetReporting",                                                 #18.9.47.4.2 (2023.01.27 - added to default configuration in script and renamed)
+    "SpynetReporting",                                                 #18.9.47.4.2 (2023.01.27 - added to default configuration in script and renamed)
     "ExploitGuard_ASR_Rules",                                           #18.9.47.5.1.1 (2023.01.27 - added to default configuration in script and renamed)
     # 18.9.47.5.1.2 - ASR Rules have been separated into different functions
     "ConfigureASRrules",                                                #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
@@ -2706,8 +2707,15 @@ function LocalSettingOverrideSpynetReporting {
 
 function SpynetReporting {
     #18.9.47.4.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\MAPS\Join Microsoft MAPS
-    Write-Info "18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" "SpynetReporting" "0" $REG_DWORD
+    
+    if ($AllowDefenderMAPS -eq $true) {
+      Write-Red "Avoiding 18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
+      Write-Red "- Joining MAPs improves AV protection. MAPS has been set to Enabled despite the CIS recommendation."
+    }
+    else {
+      Write-Info "18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
+      SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" "SpynetReporting" "0" $REG_DWORD
+    }
 }
 
 function DisableGenericRePorts {

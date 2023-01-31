@@ -17,8 +17,21 @@ $AdminAccountName = "Administrator" # Built-in admin account (disabled)
 $GuestAccountName = "NoGuest" # Build-in guest account (disabled)
 $NewLocalAdmin = "User" # Active admin account
 
-# Compatibility Assurance
-$AllowRDPClipboard = $false; # To share clipboard "TerminalServicesfDisableCdm" must be set to 0. CIS recommends it be set to 1. If this is true, the TerminalServicesfDisableCdm will not be enabled even if it's in the execution list. A CIS audit will report TerminalServicesfDisableCdm as not being implemented.
+# Compatibility Assurance / Exceptions / Additional Configurations
+$AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments.
+$AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - To share clipboard "TerminalServicesfDisableCdm" must be set to 0. CIS recommends it be set to 1. If this is true, the TerminalServicesfDisableCdm will not be enabled even if it's in the execution list. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
+
+$AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
+  "batchuser"
+  ,"batchadmin"
+)
+$AdditionalUsersToDenyRemoteDesktopServiceLogon = @(  #CIS 2.2.26 - This adds additional users to the "Deny log on through Remote Desktop Services" if you want to exclude more than just the guest user
+  "batchuser"
+  ,"batchadmin"
+)
+$AdditionalUsersToDenyLocalLogon = @(         #CIS 2.2.24 - This adds additional users to the "Deny log on locally" if you want to exclude more than just the "guest" user.
+
+)
 
 #IF YOU HAVE SPECIAL SECURITY REQUIREMENTS YOU CAN DISABLE POLICIES BELLOW
 $ExecutionList = @(
@@ -845,7 +858,19 @@ function DebugPrograms {
 function DenyNetworkAccess {
     #2.2.21 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny access to this computer from the network
     Write-Info "2.2.21 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests, Local account and member of Administrators group'"
-    SetUserRight "SeDenyNetworkLogonRight" ($SID_LOCAL_ACCOUNT, $($AdminNewAccountName),$($SID_GUESTS))
+    #SetUserRight "SeDenyNetworkLogonRight" ($SID_LOCAL_ACCOUNT, $($AdminNewAccountName),$($SID_GUESTS))
+
+    $addlDenyUsers = @()
+    if ($AdditionalUsersToDenyNetworkAccess.Count -gt 0) {
+      $addlDenyUsers = $AdditionalUsersToDenyNetworkAccess -join ","
+    }
+
+    if ($AllowRDPFromLocalAccount -eq $true) {
+        SetUserRight "SeDenyNetworkLogonRight" ($($AdminNewAccountName),$($SID_GUESTS),$addlDenyUsers)
+    }
+    else {
+        SetUserRight "SeDenyNetworkLogonRight" ($SID_LOCAL_ACCOUNT, $($AdminNewAccountName),$($SID_GUESTS),$addlDenyUsers)
+    }
 }
 
 function DenyGuestBatchLogon {

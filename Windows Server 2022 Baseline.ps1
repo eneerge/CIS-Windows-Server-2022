@@ -19,7 +19,7 @@ $NewLocalAdmin = "User" # Active admin account
 
 # Compatibility Assurance / Exceptions / Additional Configurations
 $AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments.
-$AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - To share clipboard "TerminalServicesfDisableCdm" must be set to 0. CIS recommends it be set to 1. If this is true, the TerminalServicesfDisableCdm will not be enabled even if it's in the execution list. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
+$AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - This enables "Drive Redirection" feature (TerminalServicesfDisableCdm) so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
 
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
   "batchuser"

@@ -22,16 +22,15 @@ $AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - This must be true o
 $AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - This enables "Drive Redirection" feature (TerminalServicesfDisableCdm) so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
 
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
-  "batchuser"
-  ,"batchadmin"
+  "batchuser" # you can remove this since it's just an example
 )
 $AdditionalUsersToDenyRemoteDesktopServiceLogon = @(  #CIS 2.2.26 - This adds additional users to the "Deny log on through Remote Desktop Services" if you want to exclude more than just the guest user
-  "batchuser"
-  ,"batchadmin"
+  "batchuser" # you can remove this since it's just an example
+  ,"batchadmin" # you can remove this since it's just an example
 )
 $AdditionalUsersToDenyLocalLogon = @(         #CIS 2.2.24 - This adds additional users to the "Deny log on locally" if you want to exclude more than just the "guest" user.
-  "batchuser"
-  ,"batchadmin"
+  "batchuser" # you can remove this since it's just an example
+  ,"batchadmin" # you can remove this since it's just an example
 )
 
 #IF YOU HAVE SPECIAL SECURITY REQUIREMENTS YOU CAN DISABLE POLICIES BELLOW
@@ -861,7 +860,7 @@ function DenyNetworkAccess {
     Write-Info "2.2.21 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests, Local account and member of Administrators group'"
     #SetUserRight "SeDenyNetworkLogonRight" ($SID_LOCAL_ACCOUNT, $($AdminNewAccountName),$($SID_GUESTS))
 
-    $addlDenyUsers = @()
+    $addlDenyUsers = ""
     if ($AdditionalUsersToDenyNetworkAccess.Count -gt 0) {
       $addlDenyUsers = $AdditionalUsersToDenyNetworkAccess -join ","
     }
@@ -891,7 +890,7 @@ function DenyGuestLocalLogon {
     Write-Info "2.2.24 (L1) Ensure 'Deny log on locally' to include 'Guests'"
     #SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS)
 
-    $addlDenyUsers = @()
+    $addlDenyUsers = ""
     if ($AdditionalUsersToDenyLocalLogon.Count -gt 0) {
       $addlDenyUsers = $AdditionalUsersToDenyLocalLogon -join ","
     }
@@ -902,7 +901,19 @@ function DenyGuestLocalLogon {
 function DenyRemoteDesktopServiceLogon {
     #2.2.26 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on through Remote Desktop Services
     Write-Info "2.2.26 (L1) Ensure 'Deny log on through Remote Desktop Services' is set to 'Guests, Local account'"
-    SetUserRight "SeDenyRemoteInteractiveLogonRight" ($SID_LOCAL_ACCOUNT, $GuestNewAccountName)
+
+    $addlDenyUsers = ""
+    if ($AdditionalUsersToDenyRemoteDesktopServiceLogon.Count -gt 0) {
+      $addlDenyUsers = $AdditionalUsersToDenyRemoteDesktopServiceLogon -join ","
+    }
+
+
+    if ($AllowRDPFromLocalAccount -eq $true) {
+      SetUserRight "SeDenyRemoteInteractiveLogonRight" (,$GuestNewAccountName,$addlDenyUsers)
+    }
+    else {
+      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($SID_LOCAL_ACCOUNT, $GuestNewAccountName,$addlDenyUsers)
+    }
 }
 
 function NoOneTrustedForDelegation {

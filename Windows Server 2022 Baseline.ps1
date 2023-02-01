@@ -398,6 +398,8 @@ $ExecutionList = @(
     "DisableGenericRePorts",                                            #18.9.47.11.1 (2023.01.27 - added support)
     "DisableRemovableDriveScanning",                                    #18.9.47.12.1 (2023.01.27 - added support)
     "DisableEmailScanning",                                             #18.9.47.12.2 (2023.01.27 - added support)
+    "PUAProtection",                                                    #18.9.47.15 (2023.02.01 - added to default configuration in script)
+    "DisableAntiSpyware",                                               #18.9.47.16 (2023.02.01 - added to default configuration in script)
     "OneDriveDisableFileSyncNGSC",                                      #18.9.58.1 (2023.01.27 - added to default configuration)
     "DisablePushToInstall",                                             #18.9.64.1 (2023.01.27 - added support)
     "TerminalServicesDisablePasswordSaving",                            #18.9.65.2.2 (2023.01.27 - added to default configuration)
@@ -2869,15 +2871,15 @@ function DisableGenericRePorts {
     SetRegistry "HKLM:SOFTWARE\SOFTWARE\Policies\Microsoft\Windows Defender\Reporting" "DisableGenericRePorts" "1" $REG_DWORD
 }
 
-function PUAProtection {
-    #18.9.77.14 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Configure detection for potentially unwanted applications
-    Write-Info "18.9.77.14 (L1) Ensure 'Configure detection for potentially unwanted applications' is set to 'Enabled: Block'"
+function PUAProtection  {
+    #18.9.47.15 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Configure detection for potentially unwanted applications
+    Write-Info "18.9.47.15 (L1) Ensure 'Configure detection for potentially unwanted applications' is set to 'Enabled: Block'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" "PUAProtection" "1" $REG_DWORD
 }
 
 function DisableAntiSpyware {
-    #18.9.77.15 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Turn off Windows Defender AntiVirus
-    Write-Info "18.9.77.15 (L1) Ensure 'Turn off Windows Defender AntiVirus' is set to 'Disabled'"
+    #18.9.47.16 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Turn off Windows Defender AntiVirus
+    Write-Info "18.9.47.16 (L1) Ensure 'Turn off Windows Defender AntiVirus' is set to 'Disabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender" "DisableAntiSpyware" "0" $REG_DWORD
 }
 

@@ -2329,7 +2329,7 @@ function DisableQueryRemoteServer {
 function ScenarioExecutionEnabled {
     #18.8.45.11.1 => Computer Configuration\Policies\Administrative Templates\System\Troubleshooting and Diagnostics\Windows Performance PerfTrack\Enable/Disable PerfTrack 
     Write-Info "18.8.45.11.1 (L2) Ensure 'Enable/Disable PerfTrack' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WDI\{9c5a40da-b9654fc3-8781-88dd50a6299d}" "ScenarioExecutionEnabled" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" "ScenarioExecutionEnabled" "0" $REG_DWORD
 }
 
 function DisabledAdvertisingInfo {

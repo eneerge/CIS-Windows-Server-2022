@@ -1804,7 +1804,7 @@ function ConfigureSMBv1server {
 function DisableExceptionChainValidation {
     #18.3.4 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\Enable Structured Exception Handling Overwrite Protection (SEHOP)
     Write-Info "18.3.4 (L1) Ensure 'Enable Structured Exception Handling Overwrite Protection (SEHOP)' is set to 'Enabled'"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" "DisableExceptionChainValidation" "1" $REG_DWORD
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\kernel" "DisableExceptionChainValidation" "0" $REG_DWORD
 }
 
 function RestrictDriverInstallationToAdministrators {

@@ -412,6 +412,7 @@ $ExecutionList = @(
     "TerminalServicesfDisablePNPRedir",                                 #18.9.65.3.3.6 (2023.01.27 - added to default configuration)
     "TerminalServicesfPromptForPassword",                               #18.9.65.3.9.1 (2023.01.27 - added to default configuration)
     "TerminalServicesfEncryptRPCTraffic",                               #18.9.65.3.9.2 (2023.01.27 - added to default configuration)
+    "TerminalServicesSecurityLayer",                                    #18.9.65.3.9.3 (2023.02.01 - added to default configuration)
     "TerminalServicesUserAuthentication",                               #18.9.65.3.9.4 (2023.01.27 - added to default configuration)
     "TerminalServicesMinEncryptionLevel",                               #18.9.65.3.9.5 (2023.01.27 - added to default configuration, corrected min level value)
     "TerminalServicesMaxIdleTime",                                      #18.9.65.3.10.1 (2023.01.27 - added to default configuration)
@@ -2636,9 +2637,9 @@ function TerminalServicesfEncryptRPCTraffic {
 }
 
 function TerminalServicesSecurityLayer {
-    #18.9.59.3.9.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Security\Require use of specific security layer for remote (RDP) connections
-    Write-Info "18.9.59.3.9.3 (L1) Ensure 'Require use of specific security layer for remote (RDP) connections' is set to 'Enabled: SSL'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "SecurityLayer" "1" $REG_DWORD
+    #18.9.65.3.9.3 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Security\Require use of specific security layer for remote (RDP) connections
+    Write-Info "18.9.65.3.9.3 (L1) Ensure 'Require use of specific security layer for remote (RDP) connections' is set to 'Enabled: SSL'"Require use of specific security
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "SecurityLayer" "2" $REG_DWORD
 }
 
 function TerminalServicesUserAuthentication {

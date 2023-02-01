@@ -1296,7 +1296,7 @@ function RestrictNullSessAccess {
 function RestrictRemoteSAM {
     #2.3.10.11 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network access: Restrict clients allowed to make remote calls to SAM
     Write-Info "2.3.10.11 (L1) Ensure 'Network access: Restrict clients allowed to make remote calls to SAM' is set to 'Administrators: Remote Access: Allow'"
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\RestrictRemoteSAM" (,'1,"O:BAG:BAD:(A;;RC;;;BA)')
+    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\RestrictRemoteSAM" (,'1,"O:BAG:BAD:(A;;RC;;;BA)"')
 }
 
 function NullSessionShares {

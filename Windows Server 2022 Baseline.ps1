@@ -1872,7 +1872,7 @@ function PerformRouterDiscovery {
 function SafeDllSearchMode {
     #18.4.8 => Computer Configuration\Policies\Administrative Templates\MSS (Legacy)\MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)
     Write-Info "18.4.8 (L1) Ensure 'MSS: (SafeDllSearchMode) Enable Safe DLL search mode (recommended)' is set to 'Enabled'"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\SessionManager" "SafeDllSearchMode" "1" $REG_DWORD
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager" "SafeDllSearchMode" "1" $REG_DWORD
 }
 
 function ScreenSaverGracePeriod {

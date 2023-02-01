@@ -610,7 +610,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 	
     $lines = Get-Content ${env:appdata}\secpol.cfg
     
-    $config = "$($role)= "
+    $config = "$($role) = "
     for($r =0; $r -lt $values.Length; $r++){
         if($r -eq $values.Length -1) {
             $config = "$($config) $($values[$r])"

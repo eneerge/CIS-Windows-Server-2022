@@ -1810,7 +1810,7 @@ function DisableExceptionChainValidation {
 function RestrictDriverInstallationToAdministrators {
     #18.3.5 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\Limits print driver installation to Administrators
     Write-Info "18.3.5 (L1) Ensure 'Limits print driver installation to Administrators' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "RestrictDriverInstallationToAdministrators " "1" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "RestrictDriverInstallationToAdministrators" "1" $REG_DWORD
 }
 
 function NetBIOSNodeType {

@@ -2999,7 +2999,7 @@ function NoAutoRebootWithLoggedOnUsers {
 function ConfigureAutomaticUpdates {
     #18.9.108.2.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Update\Configure Automatic Updates
     Write-Info "18.9.108.2.1 (L1) Ensure 'Configure Automatic Updates' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" "NoAutoUpdate" "4" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" "NoAutoUpdate" "0" $REG_DWORD
 }
 
 function Scheduledinstallday {

@@ -2209,7 +2209,7 @@ function SupportDeviceAuthenticationUsingCertificate {
 function DeviceEnumerationPolicy {
     #18.8.26.1 => Computer Configuration\Policies\Administrative Templates\System\Kernel DMA Protection\Enumeration policy for external devices incompatible with Kernel DMA Protection
     Write-Info "18.8.26.1 (L1) Ensure 'Enumeration policy for external devices incompatible with Kernel DMA Protection' is set to 'Enabled: Block All'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Kernel DMA Protection" "DeviceEnumerationPolicy" "1" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Kernel DMA Protection" "DeviceEnumerationPolicy" "0" $REG_DWORD
 }
 
 function BlockUserInputMethodsForSignIn {

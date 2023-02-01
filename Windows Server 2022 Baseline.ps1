@@ -1606,7 +1606,7 @@ function AuditCredentialValidation {
 function AuditComputerAccountManagement {
     #17.2.1 => Computer Configuration\Policies\Windows Settings\Security Settings\Advanced Audit Policy Configuration\Audit Policies\Account Management\Audit Application Group Management
     Write-Info "17.2.1 (L1) Ensure 'Audit Application Group Management' is set to 'Success and Failure'"
-    Auditpol /set /subcategory:"Application Group Management" /success:disable /failure:disable
+    Auditpol /set /subcategory:"Application Group Management" /success:enable /failure:enable
 }
 
 function AuditSecurityGroupManagement {

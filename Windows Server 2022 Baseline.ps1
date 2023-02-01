@@ -2275,7 +2275,7 @@ function UploadUserActivities {
 function AllowNetworkBatteryStandby {
     #18.8.34.6.1 => Computer Configuration\Policies\Administrative Templates\System\Power Management\Sleep Settings\Allow network connectivity during connected-standby (on battery)
     Write-Info "18.8.34.6.1 (L2) Ensure 'Allow network connectivity during connectedstandby (on battery)' is set to 'Disabled' "
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e898b7-4186-b944-eafa664402d9" "DCSettingIndex" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9" "DCSettingIndex" "0" $REG_DWORD
 }
 
 function AllowNetworkACStandby {

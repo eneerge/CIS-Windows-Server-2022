@@ -2589,7 +2589,7 @@ function EnableUiaRedirection {
 function TerminalServicesfDisableCcm {
     #18.9.65.3.3.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow COM port redirection
     Write-Info "18.9.65.3.3.2 (L2) Ensure 'Do not allow COM port redirection' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Service" "fDisableCcm" "1" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCcm" "1" $REG_DWORD
 }
 
 function TerminalServicesfDisableCdm {
@@ -2614,7 +2614,7 @@ function fDisableLocationRedir {
 function TerminalServicesfDisableLPT {
     #18.9.65.3.3.5 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow LPT port redirection
     Write-Info "18.9.65.3.3.5 (L2) Ensure 'Do not allow LPT port redirection' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Service" "fDisableLPT" "1" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableLPT" "1" $REG_DWORD
 }
 
 function TerminalServicesfDisablePNPRedir {

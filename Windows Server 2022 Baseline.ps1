@@ -2021,7 +2021,7 @@ function PrinterNoWarningNoElevationOnInstall {
 function PrinterUpdatePromptSettings {
     #18.6.3 => Computer Configuration\Policies\Administrative Templates\Printers\Point and Print Restrictions: When updating drivers for an existing connection 
     Write-Info "18.6.3 (L1) Ensure 'Point and Print Restrictions: When updating drivers for an existing connection' is set to 'Enabled: Show warning and elevation prompt'"
-    SetRegistry "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "NoWarningNoElevationOnInstall" "0" $REG_DWORD
+    SetRegistry "HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint" "UpdatePromptSettings" "0" $REG_DWORD
 }
 
 function NoCloudApplicationNotification {

@@ -2869,7 +2869,7 @@ function DisableScriptScanning {
 function DisableGenericRePorts {
     #18.9.47.11.1  => Computer Configuration\Policies\Administrative Templates\Windows Components\Microsoft Defender Antivirus\Reporting\Configure Watson events
     Write-Info "18.9.47.11.1 (L2) Ensure 'Configure Watson events' is set to 'Disabled'"
-    SetRegistry "HKLM:SOFTWARE\SOFTWARE\Policies\Microsoft\Windows Defender\Reporting" "DisableGenericRePorts" "1" $REG_DWORD
+    SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Reporting" "DisableGenericRePorts" "1" $REG_DWORD
 }
 
 function PUAProtection  {

@@ -1801,7 +1801,7 @@ function ConfigureSMBv1ClientDriver  {
 function ConfigureSMBv1server {
     #18.3.3 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\Configure SMB v1 server
     Write-Info "18.3.3 (L1) Ensure 'Configure SMB v1 server' is set to 'Disabled'"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" "SMB1" "4" $REG_DWORD
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" "SMB1" "0" $REG_DWORD
 }
 
 function DisableExceptionChainValidation {

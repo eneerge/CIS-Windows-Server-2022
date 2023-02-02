@@ -532,6 +532,10 @@ function Write-After($text) {
     Write-Host $text -ForegroundColor Green
 }
 
+function Write-Red($text) {
+    Write-Host $text -ForegroundColor Red
+}
+
 function CheckError([bool] $result, [string] $message) {
 	# Checks the specified result value and terminates the
 	# the script after printing the specified error message 

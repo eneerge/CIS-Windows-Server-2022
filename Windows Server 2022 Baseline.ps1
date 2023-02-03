@@ -1,3 +1,4 @@
+#github
 param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [string] $LegalNoticeMessageFile = "", [string] $ExecutionListFile = "")
 
 # CIS Microsoft Windows Server 2022 Benchmark based on https://workbench.cisecurity.org/benchmarks/8932
@@ -21,6 +22,8 @@ $NewLocalAdmin = "User" # Active admin account
 $AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments.
 $AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - This enables "Drive Redirection" feature (TerminalServicesfDisableCdm) so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
 $AllowDefenderMAPS = $true;                   # CIS 18.9.47.4.2 - CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation.
+$AllowStoringPasswordsForTasks = $true        # CIS 2.3.10.4 - CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible.
+
 
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
   "batchuser" # you can remove this since it's just an example
@@ -393,7 +396,7 @@ $ExecutionList = @(
     "EnableFileHashComputationFeature",                                 #18.9.47.6.1 (2023.01.27 - added support)
     "DisableIOAVProtection",                                            #18.9.47.9.1 (2023.01.27 - added support)
     "DisableRealtimeMonitoring",                                        #18.9.47.9.2 (2023.01.27 - added support)
-    "DisableBehaviorMonitoring",                                        #18.9.47.9.2 (2023.01.27 - added support)
+    "DisableBehaviorMonitoring",                                        #18.9.47.9.3 (2023.01.27 - added support)
     "DisableScriptScanning",                                            #18.9.47.9.4 (2023.01.27 - added support)
     "DisableGenericRePorts",                                            #18.9.47.11.1 (2023.01.27 - added support)
     "DisableRemovableDriveScanning",                                    #18.9.47.12.1 (2023.01.27 - added support)
@@ -559,12 +562,12 @@ function Write-Red($text) {
 }
 
 function CheckError([bool] $result, [string] $message) {
-	# Checks the specified result value and terminates the
-	# the script after printing the specified error message 
-	# if the specified result is false.
+  # Checks the specified result value and terminates the
+  # the script after printing the specified error message 
+  # if the specified result is false.
     if ($result -eq $false) {
         Write-Host $message -ForegroundColor Red
-        exit
+        throw $message
     }
 }
 
@@ -573,43 +576,43 @@ Write-Info "Script by Evan Greene"
 Write-Info "Original Script written and tested by Vinicius Miguel"
 
 function RegKeyExists([string] $path) {
-	# Checks whether the specified registry key exists
-	$result = Get-Item $path -ErrorAction SilentlyContinue
-	$?
+  # Checks whether the specified registry key exists
+  $result = Get-Item $path -ErrorAction SilentlyContinue
+  $?
 }
 
 function SetRegistry([string] $path, [string] $key, [string] $value, [string] $keytype) {
-	# Sets the specified registry value at the specified registry path to the specified value.
-	# First the original value is read and print to the console.
-	# If the original value does not exist, it is additionally checked
-	# whether the according registry key is missing too.
-	# If it is missing, the key is also created otherwise the 
-	# Set-ItemProperty call would fail.
-	#
-	# The original implementation used try-catch to handle the errors
-	# of Get-ItemProperty for missing values. However, Set-ItemProperty
-	# is not throwing any exceptions. The error handling has to be done
-	# by overwriting the -ErrorAction of the CmdLet and check the
-	# $? variable afterwards.
-	#
-	# See: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_commonparameters?view=powershell-7
-	# See: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-7
+  # Sets the specified registry value at the specified registry path to the specified value.
+  # First the original value is read and print to the console.
+  # If the original value does not exist, it is additionally checked
+  # whether the according registry key is missing too.
+  # If it is missing, the key is also created otherwise the 
+  # Set-ItemProperty call would fail.
+  #
+  # The original implementation used try-catch to handle the errors
+  # of Get-ItemProperty for missing values. However, Set-ItemProperty
+  # is not throwing any exceptions. The error handling has to be done
+  # by overwriting the -ErrorAction of the CmdLet and check the
+  # $? variable afterwards.
+  #
+  # See: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_commonparameters?view=powershell-7
+  # See: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-7
 
     $before = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
-	
-	if ($?) {
-		Write-Before "Was: $($before.$key)"
-	}
-	else {
+  
+  if ($?) {
+    Write-Before "Was: $($before.$key)"
+  }
+  else {
         Write-Before "Was: Not Defined!"
-		$keyExists = RegKeyExists $path
-		
-		if ($keyExists -eq $false) {
+    $keyExists = RegKeyExists $path
+    
+    if ($keyExists -eq $false) {
             Write-Info "Creating registry key '$($path)'."
-			New-Item $path -Force -ErrorAction SilentlyContinue
+      New-Item $path -Force -ErrorAction SilentlyContinue
             CheckError $? "Creating registry key '$($path)' failed."
-		}
-	}
+    }
+  }
 
     Set-ItemProperty -Path $path -Name $key -Value $value -Type $keytype -ErrorAction SilentlyContinue
 
@@ -637,8 +640,8 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     }
 
     secedit /export /cfg ${env:appdata}\secpol.cfg /areas $area
-	CheckError $? "Exporting '$($area)' to $(${env:appdata})\secpol.cfg' failed."
-	
+  CheckError $? "Exporting '$($area)' to $(${env:appdata})\secpol.cfg' failed."
+  
     $lines = Get-Content ${env:appdata}\secpol.cfg
     
     $config = "$($role) = "
@@ -680,13 +683,12 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 
     $lines | out-file ${env:appdata}\secpol.cfg
     secedit /configure /db c:\windows\security\local.sdb /cfg ${env:appdata}\secpol.cfg /areas $area
-	CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
-	
+  CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
+  
     Remove-Item -force ${env:appdata}\secpol.cfg -confirm:$false
 }
 
 function SetUserRight([string]$role, [string[]] $values, $enforceCreation=$true) {
-    $values = ($values | Sort-Object)
     SetSecEdit $role $values "User_Rights" $enforceCreation
 }
 
@@ -709,7 +711,7 @@ function EnforcePasswordHistory
 {
     #1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Scored)
     Write-Info "1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+  Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Length of password history maintained' )
     Write-After ("After hardening: *******                   ")
     net accounts /uniquepw:24
@@ -719,11 +721,11 @@ function MaximumPasswordAge
 {
     #1.1.2 => Computer Configuration\Policies\Windows Settings\Security Settings\Account Policies\Password Policy\Maximum password age
     #1.1.2 (L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0'
-    Write-Info "(L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0'"
+    Write-Info "1.1.2 (L1) Ensure 'Maximum password age' is set to '365 or fewer days, but not 0'"
     Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Maximum password age' )
     Write-After ("After hardening: *******                   ")
-    net accounts /maxpwage:60
+    net accounts /maxpwage:365
 }
 
 function MinimumPasswordAge
@@ -731,7 +733,7 @@ function MinimumPasswordAge
 
     #1.1.3 (L1) Ensure 'Minimum password age' is set to '1 or more day(s)' (Scored)
     Write-Info "1.1.3 (L1) Ensure 'Minimum password age' is set to '1 or more day(s)' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+  Write-Before ("Before hardening: *******               ")
     Write-Output (net accounts | Select-String -SimpleMatch 'Minimum password age' )
     Write-After ("After hardening: *******                   ")
     net accounts /minpwage:1
@@ -742,7 +744,7 @@ function MinimumPasswordLength
 
     #1.1.4 (L1) Ensure 'Minimum password length' is set to '14 or more character(s)' (Scored)
     Write-Info "1.1.4 (L1) Ensure 'Minimum password length' is set to '14 or more character(s)' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+  Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Minimum password length')
     Write-After ("After hardening: *******                   ")
     net accounts /MINPWLEN:14
@@ -782,7 +784,7 @@ function AccountLockoutDuration
 {
     #1.2.1 (L1) Ensure 'Account lockout duration' is set to '15 or more minute(s)' (Scored)
     Write-Info "1.2.1 (L1) Ensure 'Account lockout duration' is set to '15 or more minute(s)' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+  Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'lockout duration')
 
     Write-After ("After hardening: *******                   ")
@@ -793,7 +795,7 @@ function AccountLockoutThreshold
 {
     #1.2.2 (L1) Ensure 'Account lockout threshold' is set to '10 or fewer invalid logon attempt(s), but not 0' (Scored)
     Write-Info "1.2.2 (L1) Ensure 'Account lockout threshold' is set to '10 or fewer invalid logon attempt(s), but not 0' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+  Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'lockout threshold' )
 
     Write-After ("After hardening: *******                   ")
@@ -805,7 +807,7 @@ function  ResetAccountLockoutCounter
 {
     # 1.2.3 (L1) Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)' (Scored)
     Write-Info "1.2.3 (L1) Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)' (Scored)"
-	Write-Before ("Before hardening: *******               ")
+  Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Lockout observation window' )
 
     Write-After ("After hardening: *******                   ")
@@ -921,10 +923,10 @@ function DenyNetworkAccess {
     }
 
     if ($AllowRDPFromLocalAccount -eq $true) {
-        SetUserRight "SeDenyNetworkLogonRight" ($($AdminNewAccountName),$($SID_GUESTS),$addlDenyUsers)
+        SetUserRight "SeDenyNetworkLogonRight" ($($AdminNewAccountName),$addlDenyUsers,$($SID_GUESTS))
     }
     else {
-        SetUserRight "SeDenyNetworkLogonRight" ($SID_LOCAL_ACCOUNT, $($AdminNewAccountName),$($SID_GUESTS),$addlDenyUsers)
+        SetUserRight "SeDenyNetworkLogonRight" ($($AdminNewAccountName),$addlDenyUsers,$SID_LOCAL_ACCOUNT,$($SID_GUESTS))
     }
 }
 
@@ -950,7 +952,7 @@ function DenyGuestLocalLogon {
       $addlDenyUsers = $AdditionalUsersToDenyLocalLogon -join ","
     }
 
-    SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS,$addlDenyUsers)
+    SetUserRight "SeDenyInteractiveLogonRight" ($addlDenyUsers,$SID_GUESTS)
 }
 
 function DenyRemoteDesktopServiceLogon {
@@ -967,7 +969,7 @@ function DenyRemoteDesktopServiceLogon {
       SetUserRight "SeDenyRemoteInteractiveLogonRight" (,$GuestNewAccountName,$addlDenyUsers)
     }
     else {
-      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($SID_LOCAL_ACCOUNT, $GuestNewAccountName,$addlDenyUsers)
+      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($GuestNewAccountName,$addlDenyUsers,$SID_LOCAL_ACCOUNT)
     }
 }
 
@@ -1278,6 +1280,7 @@ function LSAAnonymousNameDisabled {
     #2.3.10.1 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network access: Allow anonymous SID/Name translation
     Write-Info "2.3.10.1 (L1) Ensure 'Network access: Allow anonymous SID/Name translation' is set to 'Disabled'"
     SetSecurityPolicy "LSAAnonymousNameLookup" (,"0")
+    SetRegistry "HKLM:\System\CurrentControlSet\Control\Lsa" "TurnOffAnonymousBlock" "1" $REG_DWORD
 }
 
 function RestrictAnonymousSAM {
@@ -1295,7 +1298,13 @@ function RestrictAnonymous {
 function DisableDomainCreds {
     #2.3.10.4 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network access: Do not allow storage of passwords and credentials for network authentication
     Write-Info "2.3.10.4 (L2) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled'"
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds" (,"4,1")
+    if ($AllowStoringPasswordsForTasks -eq $false) {
+      SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds" (,"4,1")
+    }
+    else {
+      Write-Red "Skipping 2.3.10.4 (L2) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled'"
+      Write-Red '- You enabled $AllowStoringPasswordsForTasks. This CIS configuration has been skipped so that passwords can be saved for automated tasks.'
+    }
 }
 
 function EveryoneIncludesAnonymous {
@@ -2381,7 +2390,7 @@ function DisableQueryRemoteServer {
 }
 
 function ScenarioExecutionEnabled {
-    #18.8.45.11.1 => Computer Configuration\Policies\Administrative Templates\System\Troubleshooting and Diagnostics\Windows Performance PerfTrack\Enable/Disable PerfTrack 
+    #18.8.48.11.1 => Computer Configuration\Policies\Administrative Templates\System\Troubleshooting and Diagnostics\Windows Performance PerfTrack\Enable/Disable PerfTrack 
     Write-Info "18.8.45.11.1 (L2) Ensure 'Enable/Disable PerfTrack' is set to 'Disabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d}" "ScenarioExecutionEnabled" "0" $REG_DWORD
 }
@@ -2772,12 +2781,6 @@ function SpynetReporting {
     }
 }
 
-function DisableGenericRePorts {
-    #18.9.47.11.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Reporting\Configure Watson events
-    Write-Info "18.9.47.11.1 (L2) Ensure 'Configure Watson events' is set to 'Disabled'"
-    SetRegistry "HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Reporting" "DisableGenericRePorts" "1" $REG_DWORD
-}
-
 function DisableRemovableDriveScanning {
     #18.9.47.12.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\Scan\Scan removable drives
     Write-Info "18.9.47.12.1 (L1) Ensure 'Scan removable drives' is set to 'Enabled'"
@@ -2831,12 +2834,12 @@ function ConfigureASRRuleBlockWin32ApiFromOfficeMacro {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "92e97fa1-2edf-4476-bdd6-9dd0b4dddc7b" "1" $REG_SZ
 }
 
-function ConfigureASRRuleBlockUntrustedUnsignedProcessesUSB {
+function ConfigureASRRuleBlockCredStealingFromLsass {
     Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block credential stealing from the Windows local security authority subsystem (lsass.exe)"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "9e6c4e1f-7d60-472f-ba1a-a39ef669e4b2" "1" $REG_SZ
 }
 
-function ConfigureASRRuleBlockCredStealingFromLsass {
+function ConfigureASRRuleBlockUntrustedUnsignedProcessesUSB {
     Write-Info "18.9.47.5.1.2 (L1) ASR Rule: Block untrusted and unsigned processes that run from USB"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules" "b2b3f03d-6a65-4f7b-a9c7-1c7ef74a9ba4" "1" $REG_SZ
 }

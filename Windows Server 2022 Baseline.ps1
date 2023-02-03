@@ -619,7 +619,7 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
     CheckError $? "Creating registry value '$($path):$($value)' failed."
     
     $after = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
-    Write-After "Now is: $($after.$key)"
+    Write-After "Now: $($after.$key)"
     
     if ($before.$key -ne $after.$key) {
         Write-Red "Value changed."

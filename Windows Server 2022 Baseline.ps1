@@ -685,6 +685,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 }
 
 function SetUserRight([string]$role, [string[]] $values, $enforceCreation=$true) {
+    $values = ($values | Sort-Object)
     SetSecEdit $role $values "User_Rights" $enforceCreation
 }
 

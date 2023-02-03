@@ -643,9 +643,9 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     $config = "$($role) = "
     for($r =0; $r -lt $values.Length; $r++){
         if($r -eq $values.Length -1) {
-            $config = "$($config) $($values[$r])"
+            $config = "$($config)$($values[$r])"
         } else {
-            $config = "$($config) $($values[$r]), "
+            $config = "$($config)$($values[$r]),"
         }
     }
 
@@ -657,7 +657,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
             $lines[$i] = $config
             $valueSet = $true
             Write-After "Now is: $($lines[$i])"
-            
+
             if ($lines[$i] -ne $before) {
                 Write-Red "Value changed."
             }

@@ -468,21 +468,43 @@ $ExecutionList = @(
 
 )
 
-
 if($NewLocalAdminPswd -ne "") {
     $NewLocalAdminPassword = ConvertTo-SecureString $NewLocalAdminPswd -AsPlainText -Force
 }
 
 
-#Randomize the new admin and guest accounts on each system.
-#This increases the security not affecting the accessibility since these accounts are always disabled. 
+$AdminNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-500'").Name
+$GuestNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-501'").Name
 
-$seed_admin = Get-Random -Minimum 1000 -Maximum 9999
-$seed_guest = Get-Random -Minimum 1000 -Maximum 9999
+# If the "RenameAdministratorAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
+if ($ExecutionList.Contains("RenameAdministratorAccount")) {
+  $seed_admin = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system.
+  $AdminNewAccountName = "DisabledUser$($seed_admin)"
+}
 
-$AdminNewAccountName = "DisabledUser$($seed_admin)"
+# If the "RenameGuestAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
+if ($ExecutionList.Contains("RenameGuestAccount")) {
+  $seed_guest = Get-Random -Minimum 1000 -Maximum 9999 #Randomize the new admin and guest accounts on each system.
+  $GuestNewAccountName = "DisabledUserSec$($seed_guest)"  
+}
 
-$GuestNewAccountName = "DisabledUserSec$($seed_guest)"
+# Ensure the additional users specified for settings exist to prevent issues with applying policy
+$existingUsers = (Get-LocalUser).Name
+foreach ($u in $AdditionalUsersToDenyLocalLogon) {
+  if (!$existingUsers.Contains($u)) {
+    $AdditionalUsersToDenyLocalLogon = $AdditionalUsersToDenyLocalLogon | Where-Object { $_ -ne $u }
+  }
+}
+foreach ($u in $AdditionalUsersToDenyRemoteDesktopServiceLogon) {
+  if (!$existingUsers.Contains($u)) {
+    $AdditionalUsersToDenyRemoteDesktopServiceLogon = $AdditionalUsersToDenyRemoteDesktopServiceLogon | Where-Object { $_ -ne $u }
+  }
+}
+foreach ($u in $AdditionalUsersToDenyNetworkAccess) {
+  if (!$existingUsers.Contains($u)) {
+    $AdditionalUsersToDenyNetworkAccess = $AdditionalUsersToDenyNetworkAccess | Where-Object { $_ -ne $u }
+  }
+}
 
 #DO NOT CHANGE CODE BELLOW THIS LINE IF YOU ARE NOT 100% SURE ABOUT WHAT YOU ARE DOING!
 ##########################################################################################################

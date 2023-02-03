@@ -617,6 +617,10 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
     
     $after = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
     Write-After "Now is: $($after.$key)"
+    
+    if ($before.$key -ne $after.$key) {
+        Write-Red "Value changed."
+    }
 }
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {

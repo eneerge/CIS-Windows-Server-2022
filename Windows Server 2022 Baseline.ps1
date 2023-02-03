@@ -625,6 +625,7 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
     $valueSet = $false
+    $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries) # remove blank values
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"

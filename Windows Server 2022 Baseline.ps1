@@ -652,9 +652,15 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     for($i =0; $i -lt $lines.Length; $i++) {
         if($lines[$i].Contains($role)) {
             Write-Before "Was: $($lines[$i])"
+            $before = $($lines[$i])
+
             $lines[$i] = $config
             $valueSet = $true
             Write-After "Now is: $($lines[$i])"
+            
+            if ($lines[$i] -ne $before) {
+                Write-Red "Value changed."
+            }
         }
     }
 
@@ -663,6 +669,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
             Write-Before "Was: Not Defined"
             $lines += $config
             Write-After "Now is: $($lines[$lines.Length -1])"
+            Write-Red "Value changed."
         }
     }
 
@@ -2750,7 +2757,7 @@ function SpynetReporting {
     #18.9.47.4.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\MAPS\Join Microsoft MAPS
     
     if ($AllowDefenderMAPS -eq $true) {
-      Write-Red "Avoiding 18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
+      Write-Red "Skipping 18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
       Write-Red "- Joining MAPs improves AV protection. MAPS has been set to Enabled despite the CIS recommendation."
     }
     else {

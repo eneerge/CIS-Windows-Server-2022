@@ -628,7 +628,11 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
     $valueSet = $false
-    $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries) # remove blank values
+    $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries)
+
+    Write-Host "Values:---------"
+    $values
+    Write-Host "---------"
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"
@@ -640,15 +644,18 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     }
 
     secedit /export /cfg ${env:appdata}\secpol.cfg /areas $area
-  CheckError $? "Exporting '$($area)' to $(${env:appdata})\secpol.cfg' failed."
-  
+	CheckError $? "Exporting '$($area)' to $(${env:appdata})\secpol.cfg' failed."
+	
     $lines = Get-Content ${env:appdata}\secpol.cfg
     
     $config = "$($role) = "
     for($r =0; $r -lt $values.Length; $r++){
+        # last iteration
         if($r -eq $values.Length -1) {
             $config = "$($config)$($values[$r])"
-        } else {
+        } 
+        # not last (include a comma)
+        else {
             $config = "$($config)$($values[$r]),"
         }
     }
@@ -660,8 +667,8 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 
             $lines[$i] = $config
             $valueSet = $true
-            Write-After "Now is: $($lines[$i])"
-
+            Write-After "Now: $($lines[$i])"
+            
             if ($lines[$i] -ne $before) {
                 Write-Red "Value changed."
             }
@@ -673,7 +680,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
             Write-Before "Was: Not Defined"
             $lines += $config
             $after = $($lines[$lines.Length -1])
-            Write-After "Now is: $($after)"
+            Write-After "Now: $($after)"
 
             if ($($lines[$lines.Length -1]) -ne "$($role) = `"`"") {
                 Write-Red "Value changed."
@@ -683,8 +690,8 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 
     $lines | out-file ${env:appdata}\secpol.cfg
     secedit /configure /db c:\windows\security\local.sdb /cfg ${env:appdata}\secpol.cfg /areas $area
-  CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
-  
+	CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
+	
     Remove-Item -force ${env:appdata}\secpol.cfg -confirm:$false
 }
 

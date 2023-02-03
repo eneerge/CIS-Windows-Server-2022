@@ -532,6 +532,10 @@ function Write-After($text) {
     Write-Host $text -ForegroundColor Green
 }
 
+function Write-Red($text) {
+    Write-Host $text -ForegroundColor Red
+}
+
 function CheckError([bool] $result, [string] $message) {
 	# Checks the specified result value and terminates the
 	# the script after printing the specified error message 
@@ -849,8 +853,16 @@ function NoOneCreatesSharedObjects {
 
 function CreateSymbolicLinks {
     #2.2.18 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create symbolic links
-    Write-Info "2.2.18 (L1) Ensure 'Create symbolic links' is set to 'Administrators, NT VIRTUAL MACHINE\Virtual Machines'"
-    SetUserRight "SeCreateSymbolicLinkPrivilege" ($SID_ADMINISTRATORS,$SID_VIRTUAL_MACHINE)
+    #Check if Hyper-V is installed before deploying the setting, so no unrecognized SID will be added when Hyper-V is not installed
+    if ((Get-WindowsFeature -Name Hyper-V).Installed -eq $false)
+    {
+        Write-Info "2.2.18 (L1) Ensure 'Create symbolic links' is set to 'Administrators'"
+        SetUserRight "SeCreateSymbolicLinkPrivilege" (,$SID_ADMINISTRATORS)
+    }
+    else {
+        Write-Info "2.2.18 (L1) Ensure 'Create symbolic links' is set to 'Administrators, NT VIRTUAL MACHINE\Virtual Machines'"
+        SetUserRight "SeCreateSymbolicLinkPrivilege" ($SID_ADMINISTRATORS,$SID_VIRTUAL_MACHINE)
+    }
 }
 
 function DebugPrograms {

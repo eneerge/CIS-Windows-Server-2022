@@ -668,8 +668,12 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
         if($valueSet -eq $false) {
             Write-Before "Was: Not Defined"
             $lines += $config
-            Write-After "Now is: $($lines[$lines.Length -1])"
-            Write-Red "Value changed."
+            $after = $($lines[$lines.Length -1])
+            Write-After "Now is: $($after)"
+
+            if ($($lines[$lines.Length -1]) -ne "$($role) = `"`"") {
+                Write-Red "Value changed."
+            }
         }
     }
 

@@ -1,8 +1,7 @@
-#github
 param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [string] $LegalNoticeMessageFile = "", [string] $ExecutionListFile = "")
 
 # CIS Microsoft Windows Server 2022 Benchmark based on https://workbench.cisecurity.org/benchmarks/8932
-# Script from https://github.com/eneerge/CIS-Windows-Server-2022
+# Script by Evan Greene from https://github.com/eneerge/CIS-Windows-Server-2022
 
 # Original script from https://github.com/viniciusmiguel/CIS-Microsoft-Windows-Server-2019-Benchmark (deleted by author)
 
@@ -24,7 +23,6 @@ $AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - This enables
 $AllowDefenderMAPS = $true;                   # CIS 18.9.47.4.2 - CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation.
 $AllowStoringPasswordsForTasks = $true        # CIS 2.3.10.4 - CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible.
 
-
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
   "batchuser" # you can remove this since it's just an example
 )
@@ -44,6 +42,7 @@ $ExecutionList = @(
     "RenameAdministratorAccount",                                       #2.3.1.5 
     "RenameGuestAccount",                                               #2.3.1.6
     ###########################
+    #"ResetSec",                                                        # Uncomment to reset the "Local Security Policy" (this doesn't touch the registry settings that are not in the Local Security Policy)
     "EnforcePasswordHistory",                                           #1.1.1
     "MaximumPasswordAge",                                               #1.1.2
     "MinimumPasswordAge",                                               #1.1.3
@@ -194,8 +193,8 @@ $ExecutionList = @(
     "PublicDefaultInboundAction",                                       #9.3.2
     "PublicDefaultOutboundAction",                                      #9.3.3
     "PublicDisableNotifications",                                       #9.3.4
-    "PublicAllowLocalPolicyMerge",                                      #9.3.5            -------------------- review
-    "PublicAllowLocalIPsecPolicyMerge",                                 #9.3.6      -------------------- review
+    "PublicAllowLocalPolicyMerge",                                      #9.3.5
+    "PublicAllowLocalIPsecPolicyMerge",                                 #9.3.6
     "PublicLogFilePath",                                                #9.3.7
     "PublicLogFileSize",                                                #9.3.8
     "PublicLogDroppedPackets",                                          #9.3.9
@@ -368,8 +367,10 @@ $ExecutionList = @(
     "LocationAndSensorsDisableLocation",                                #18.9.41.1 (2023.01.27 - added to default configuration in script and renamed)
     "MessagingAllowMessageSync",                                        #18.9.45.1 (2023.01.27 - added to default configuration in script and renamed)
     "MicrosoftAccountDisableUserAuth",                                  #18.9.46.1 (2023.01.27 - added to default configuration in script and renamed)
+    
     "LocalSettingOverrideSpynetReporting",                              #18.9.47.4.1 (2023.01.27 - added to default configuration in script and renamed)
-    "SpynetReporting",                                                 #18.9.47.4.2 (2023.01.27 - added to default configuration in script and renamed)
+    "SpynetReporting",                                                  #18.9.47.4.2 (2023.01.27 - added to default configuration in script and renamed)
+
     "ExploitGuard_ASR_Rules",                                           #18.9.47.5.1.1 (2023.01.27 - added to default configuration in script and renamed)
     # 18.9.47.5.1.2 - ASR Rules have been separated into different functions
     "ConfigureASRrules",                                                #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
@@ -380,12 +381,12 @@ $ExecutionList = @(
     "ConfigureASRRuleBlockAdobeReaderChildProcess",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockWin32ApiFromOfficeMacro",                     #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockCredStealingFromLsass",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockUntrustedUnsignedProcessesUSB",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
-    "ConfigureASRRuleBlockExeutablesFromEmails",                       #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockUntrustedUnsignedProcessesUSB",               #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
+    "ConfigureASRRuleBlockExeutablesFromEmails",                        #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockJSVBSLaunchingExeContent",                    #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockOfficeChildProcess",                          #18.9.47.5.1.2 (2023.01.27 - added to default configuration in script)
     "ConfigureASRRuleBlockPersistenceThroughWMI",                       #18.9.47.5.1.2 (2023.01.27 - added support)
-    
+
     # Not in CIS, but recommended
     "ConfigureASRRuleBlockExploitedSignedDrivers",                      #18.9.47.5.1.2 (2023.01.30 - added support)
     "ConfigureASRRuleBlockExeUnlessMeetPrevalence",                     #18.9.47.5.1.2 (2023.01.30 - added support)
@@ -401,11 +402,16 @@ $ExecutionList = @(
     "DisableGenericRePorts",                                            #18.9.47.11.1 (2023.01.27 - added support)
     "DisableRemovableDriveScanning",                                    #18.9.47.12.1 (2023.01.27 - added support)
     "DisableEmailScanning",                                             #18.9.47.12.2 (2023.01.27 - added support)
+
     "PUAProtection",                                                    #18.9.47.15 (2023.02.01 - added to default configuration in script)
     "DisableAntiSpyware",                                               #18.9.47.16 (2023.02.01 - added to default configuration in script)
+
+
+
     "OneDriveDisableFileSyncNGSC",                                      #18.9.58.1 (2023.01.27 - added to default configuration)
     "DisablePushToInstall",                                             #18.9.64.1 (2023.01.27 - added support)
     "TerminalServicesDisablePasswordSaving",                            #18.9.65.2.2 (2023.01.27 - added to default configuration)
+
     "fSingleSessionPerUser",                                            #18.9.65.3.2.1 (2023.01.27 - added to default configuration)
     "EnableUiaRedirection",                                             #18.9.65.3.3.1 (2023.01.27 - added support)
     "TerminalServicesfDisableCcm",                                      #18.9.65.3.3.2 (2023.01.27 - added to default configuration)
@@ -436,7 +442,7 @@ $ExecutionList = @(
     "EnableScriptBlockLogging",                                         #18.9.100.1 (2023.01.27 - added to default configuration, corrected reg value)
     "EnableTranscripting",                                              #18.9.100.2 (2023.01.27 - added to default configuration)
     "WinRMClientAllowBasic",                                            #18.9.102.1.1 (2023.01.27 - added to default configuration)
-    "WinRMClientAllowUnencryptedTraffic",                               #18.9.102.1.2 (2023.01.27 - added to default configuration)
+    "WinRMClientAllowUnencryptedTraffic",                               #18.9.102.1.2 (2023.01.30 - added support)
     "WinRMClientAllowDigest",                                           #18.9.102.1.3 (2023.01.27 - added to default configuration, corrected reg value)
     "WinRMServiceAllowBasic",                                           #18.9.102.2.1 (2023.01.27 - added to default configuration)
     "WinRMServiceAllowAutoConfig",                                      #18.9.102.2.2 (2023.01.27 - added to default configuration)
@@ -474,7 +480,6 @@ $ExecutionList = @(
 if($NewLocalAdminPswd -ne "") {
     $NewLocalAdminPassword = ConvertTo-SecureString $NewLocalAdminPswd -AsPlainText -Force
 }
-
 
 $AdminNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-500'").Name
 $GuestNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-501'").Name
@@ -541,6 +546,8 @@ $REG_MULTI_SZ = "MultiString"
 $REG_QWORD = "Qword"
 
 ##########################################################################################################
+
+$global:valueChanges = @()
 
 $fc = $host.UI.RawUI.ForegroundColor
 $host.UI.RawUI.ForegroundColor = "white"
@@ -620,19 +627,21 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
     
     $after = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
     Write-After "Now: $($after.$key)"
-    
+
     if ($before.$key -ne $after.$key) {
         Write-Red "Value changed."
+        $global:valueChanges += "$path => $($before.$key) to $($after.$key)"
     }
+}
+
+# Resets the security policy
+function ResetSec {
+  secedit /configure /cfg C:\windows\inf\defltbase.inf /db C:\windows\system32\defltbase.sdb /verbose
 }
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
     $valueSet = $false
     $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries)
-
-    Write-Host "Values:---------"
-    $values
-    Write-Host "---------"
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"
@@ -644,10 +653,10 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     }
 
     secedit /export /cfg ${env:appdata}\secpol.cfg /areas $area
-	CheckError $? "Exporting '$($area)' to $(${env:appdata})\secpol.cfg' failed."
-	
+    CheckError $? "Exporting '$($area)' to $(${env:appdata})\secpol.cfg' failed."
+  
     $lines = Get-Content ${env:appdata}\secpol.cfg
-    
+
     $config = "$($role) = "
     for($r =0; $r -lt $values.Length; $r++){
         # last iteration
@@ -662,16 +671,19 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 
     for($i =0; $i -lt $lines.Length; $i++) {
         if($lines[$i].Contains($role)) {
-            Write-Before "Was: $($lines[$i])"
             $before = $($lines[$i])
-
+            Write-Before "Was: $before"
+            
             $lines[$i] = $config
             $valueSet = $true
-            Write-After "Now: $($lines[$i])"
+            Write-After "Now: $config"
             
-            if ($lines[$i] -ne $before) {
+            if ($config.Replace(" ","") -ne $before.Replace(" ","")) {
                 Write-Red "Value changed."
+                $global:valueChanges += "$before => $config"
             }
+
+            break;
         }
     }
 
@@ -679,19 +691,21 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
         if($valueSet -eq $false) {
             Write-Before "Was: Not Defined"
             $lines += $config
+
             $after = $($lines[$lines.Length -1])
             Write-After "Now: $($after)"
 
-            if ($($lines[$lines.Length -1]) -ne "$($role) = `"`"") {
-                Write-Red "Value changed."
+            if ($after -ne "$($role) = `"`"") {
+                    Write-Red "Value changed."
+                    $global:valueChanges += "Not defined => $after"
             }
         }
     }
 
     $lines | out-file ${env:appdata}\secpol.cfg
     secedit /configure /db c:\windows\security\local.sdb /cfg ${env:appdata}\secpol.cfg /areas $area
-	CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
-	
+    CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
+  
     Remove-Item -force ${env:appdata}\secpol.cfg -confirm:$false
 }
 
@@ -759,14 +773,12 @@ function MinimumPasswordLength
 
 function WindowsPasswordComplexityPolicyMustBeEnabled
 {
-
     #1.1.5 (L1) Ensure 'Password must meet complexity requirements' is set to 'Enabled' (Scored)
     Write-Info "1.1.5 (L1) Ensure 'Password must meet complexity requirements' is set to 'Enabled' (Scored)"
     secedit /export /cfg ${env:appdata}\secpol.cfg
     (Get-Content ${env:appdata}\secpol.cfg).replace("PasswordComplexity = 0", "PasswordComplexity = 1") | Out-File ${env:appdata}\secpol.cfg
     secedit /configure /db c:\windows\security\local.sdb /cfg ${env:appdata}\secpol.cfg /areas SECURITYPOLICY
     Remove-Item -force ${env:appdata}\secpol.cfg -confirm:$false
-
 }
 
 function RelaxMinPasswordLength
@@ -973,7 +985,7 @@ function DenyRemoteDesktopServiceLogon {
 
 
     if ($AllowRDPFromLocalAccount -eq $true) {
-      SetUserRight "SeDenyRemoteInteractiveLogonRight" (,$GuestNewAccountName,$addlDenyUsers)
+      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($GuestNewAccountName,$addlDenyUsers)
     }
     else {
       SetUserRight "SeDenyRemoteInteractiveLogonRight" ($GuestNewAccountName,$addlDenyUsers,$SID_LOCAL_ACCOUNT)
@@ -1202,7 +1214,12 @@ function MachineInactivityLimit {
 function LogonLegalNotice {
     #2.3.7.4 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Interactive logon: Message text for users attempting to log on
     Write-Info "2.3.7.4 (L1) Configure 'Interactive logon: Message text for users attempting to log on'"
-    SetSecurityPolicy "MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText" ("7",$LogonLegalNoticeMessage)
+    if ($LogonLegalNoticeMessage.Length -gt 0) {
+        SetSecurityPolicy "MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText" ("7",$LogonLegalNoticeMessage)
+    }
+    else {
+        SetSecurityPolicy "MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\LegalNoticeText" ("7,")
+    }
 }
 
 function LogonLegalNoticeTitle {
@@ -1305,6 +1322,7 @@ function RestrictAnonymous {
 function DisableDomainCreds {
     #2.3.10.4 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network access: Do not allow storage of passwords and credentials for network authentication
     Write-Info "2.3.10.4 (L2) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled'"
+
     if ($AllowStoringPasswordsForTasks -eq $false) {
       SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds" (,"4,1")
     }
@@ -1323,7 +1341,7 @@ function EveryoneIncludesAnonymous {
 function NullSessionPipes {
     #2.3.10.7 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network access: Named Pipes that can be accessed anonymously
     Write-Info "2.3.10.7 (L1) Configure 'Network access: Named Pipes that can be accessed anonymously'"
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionPipes" ("7", " ")
+    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionPipes" ("7,", " ")
 }
 
 function AllowedExactPaths {
@@ -1417,8 +1435,8 @@ function ForceLogoff {
 function LmCompatibilityLevel {
     #2.3.11.7 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: LAN Manager authentication level
     Write-Info "2.3.11.7 Ensure 'Network security: LAN Manager authentication level' is set to 'Send NTLMv2 response only. Refuse LM & NTLM'"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" "LmCompatibilityLevel" "5" $REG_DWORD
     SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\LmCompatibilityLevel" (,"4,5")
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Control\Lsa" "LmCompatibilityLevel" "5" $REG_DWORD
 }
 
 function LDAPClientIntegrity {
@@ -2037,7 +2055,7 @@ function StdDomainUserSetLocation {
 
 function HardenedPaths {
     #18.5.14.1 => Computer Configuration\Policies\Administrative Templates\Network\Network Provider\Hardened UNC Paths
-    Write-Info "18.5.14.1 (L1) Ensure 'Hardened UNC Paths' is set to 'Enabled, with "Require Mutual Authentication" and "Require Integrity" set for all NETLOGON and SYSVOL shares'"
+    Write-Info "18.5.14.1 (L1) Ensure 'Hardened UNC Paths' is set to 'Enabled, with 'Require Mutual Authentication' and 'Require Integrity' set for all NETLOGON and SYSVOL shares"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths" "\\*\NETLOGON" "RequireMutualAuthentication=1, RequireIntegrity=1" $REG_SZ
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths" "\\*\SYSVOL" "RequireMutualAuthentication=1, RequireIntegrity=1" $REG_SZ
 }
@@ -3092,7 +3110,6 @@ function WindowsUpdateQuality {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" "DeferQualityUpdatesPeriodInDays" "0" $REG_DWORD
 }
 
-
 function ValidatePasswords([string] $pass1, [string] $pass2) {
     if($pass1 -ne $pass2) { return $False }
     if($pass1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!%*?&])[A-Za-z\d@$#^!%*?&]{15,}$") { return $False }
@@ -3104,6 +3121,7 @@ if ([Environment]::Is64BitProcess -ne [Environment]::Is64BitOperatingSystem)
     Write-Error "Aborted."
     return 1;
 }
+
 if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
     $temp_pass1 = ""
     $temp_pass2 = ""
@@ -3140,8 +3158,6 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
         } while($invalid_pass -eq $false)
     }
     
-    
-
     if($LegalNoticeMessageFile -ne "") {
         if(Test-Path($LegalNoticeMessageFile) -eq $False) {
             Write-Error "The script cannot continue, The LegalNoticeMessageFile was provided but could not found"
@@ -3169,19 +3185,34 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
 
     $location = Get-Location
     
-    secedit /export /cfg $location\secedit_original.cfg
+    secedit /export /cfg "$location\secedit_original.cfg"  | out-null
     
-    $ExecutionList | ForEach-Object { ( Invoke-Expression $_) } | Out-File $location\Report.txt 
-    $ExecutionList | Measure-Object -Line 
-    $ExecutionList | Out-File $location\PoliciesApplied.txt
+    Start-Transcript -Path "$location\PolicyResults.txt"
+    $ExecutionList | ForEach-Object { ( Invoke-Expression $_) } | Out-File $location\CommandsReport.txt
 
-    secedit /export /cfg $location\secedit_final.cfg
+    Stop-Transcript
+    
+    "The following policies were defined in the ExecutionList: " | Out-File $location\PoliciesApplied.txt
+    $ExecutionList | Out-File $location\PoliciesApplied.txt -Append
 
-} else {
+    Write-Host ""
+    Start-Transcript -Path "$location\PolicyChangesMade.txt"
+    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    Write-After "Changes Made"
+    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    Write-Red ($global:valueChanges -join "`n")
+    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    Stop-Transcript 
 
-    Write-Error "You must execute this script with administrator privileges!"
-    Write-Error "Aborted."
-    return 1;
-}
+    secedit /export /cfg $location\secedit_final.cfg | out-null
+
+    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+    Write-After "Completed. Logs written to: $location"
+} 
+    else {
+        Write-Error "You must execute this script with administrator privileges!"
+        Write-Error "Aborted."
+        return 1;
+    }
 
 $host.UI.RawUI.ForegroundColor = $fc

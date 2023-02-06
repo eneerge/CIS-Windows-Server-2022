@@ -721,9 +721,18 @@ function SetSecurityPolicy([string]$role, [string[]] $values, $enforceCreation=$
 }
 
 function CreateUserAccount([string] $username, [securestring] $password, [bool] $isAdmin=$false) {
-    New-LocalUser -Name $username -Password $password -Description "" -AccountNeverExpires -PasswordNeverExpires
-    if($isAdmin -eq $true) {
-        Add-LocalGroupMember -Group "Administrators" -Member $username
+    $NewLocalAdminExists = Get-LocalUser -Name $username -ErrorAction SilentlyContinue
+    if ($NewLocalAdminExists) {
+        Write-Red "Skipping creating new Administrator account"
+        Write-Red "- New Administrator account already exists: $($username)"
+    }
+    else {
+        New-LocalUser -Name $username -Password $password -Description "" -AccountNeverExpires -PasswordNeverExpires
+        Write-Info "New Administrator account created: $($username)."
+        if($isAdmin -eq $true) {
+            Add-LocalGroupMember -Group "Administrators" -Member $username
+            Write-Info "Administrator account $($username) is now member of the local Administrators group."
+        }
     }
 }
 

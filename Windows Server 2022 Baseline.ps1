@@ -2815,14 +2815,15 @@ function LocalSettingOverrideSpynetReporting {
 
 function SpynetReporting {
     #18.9.47.4.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows Defender Antivirus\MAPS\Join Microsoft MAPS
-    
-    if ($AllowDefenderMAPS -eq $true) {
-      Write-Red "Skipping 18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
-      Write-Red "- Joining MAPs improves AV protection. MAPS has been set to Enabled despite the CIS recommendation."
+    if ($AllowDefenderMAPS -eq $false) {
+        Write-Info "18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
+        SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" "SpynetReporting" "0" $REG_DWORD
+      
     }
     else {
-      Write-Info "18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
-      SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" "SpynetReporting" "0" $REG_DWORD
+        Write-Red "Opposing 18.9.47.4.2 (L2) Ensure 'Join Microsoft MAPS' is set to 'Disabled'"
+        Write-Red "- You enabled $AllowDefenderMAPS. This CIS configuration has been altered so MAPS will be joined and cloud protection will be better."
+        SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet" "SpynetReporting" "1" $REG_DWORD
     }
 }
 

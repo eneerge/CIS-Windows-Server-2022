@@ -14,7 +14,7 @@ To use:
 - Configure `$EventLogMaxFileSize` (defaults to 4gb)
 - Configure `$AdminAccountName` to what you want to call the built-in admin account that is disabled after the script has been run (required, defaults to "Administrator")
 - Configure `$GuestAccountName` to what you want to call the built-in guest account that is disabled after the script has been run (required, defaults to "NoGuest")
-- Configure compatibility assurance - These options will automatically enable/disable CIS settings that may break your server.
+- Configure compatibility assurance - These options will oppose CIS settings that may break your server. Setting the value to true will alter your policy settings to maintain compatibility.
   - `$AllowRDPFromLocalAccount` - This option enables you to remote desktop into the server using a local account. If you are using ActiveDirectory, you will want to set this to $false. If you are not using ActiveDirectory, you will likely want this to be $true.
   - `$AllowRDPClipboard` - This option allows you to copy/paste into a remote desktop session. Otherwise, the feature won't work. Recommend to leave it $true if you need to copy/paste in an RDP session.
   - `$AllowDefenderMAPS` - This enables joining Microsoft MAPS (Spynet). CIS recommends disabling this for privacy reasons, but certain features of Microsoft Defender require this to be enabled to work. Recommend this to $true if you prefer greater AV protection. Set to $false if you prefer better privacy with the con of losing some of the cloud protection features of Defender.

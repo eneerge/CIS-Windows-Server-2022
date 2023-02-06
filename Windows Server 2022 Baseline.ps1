@@ -2705,8 +2705,9 @@ function TerminalServicesfDisableCdm {
       SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCdm" "1" $REG_DWORD
     }
     else {
-      Write-Red "Skipping 18.9.65.3.3.3 (L1) Ensure 'Do not allow drive redirection' is set to 'Enabled'"
+      Write-Red "Opposing 18.9.65.3.3.3 (L1) Ensure 'Do not allow drive redirection' is set to 'Enabled'"
       Write-Red '- You enabled $AllowRDPClipboard. This CIS configuration has been skipped so that the clipboard can be used.'
+      SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCdm" "0" $REG_DWORD
     }
 }
 

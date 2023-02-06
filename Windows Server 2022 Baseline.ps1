@@ -22,6 +22,7 @@ $AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - This must be true o
 $AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - This enables "Drive Redirection" feature (TerminalServicesfDisableCdm) so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session.
 $AllowDefenderMAPS = $true;                   # CIS 18.9.47.4.2 - CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation.
 $AllowStoringPasswordsForTasks = $true        # CIS 2.3.10.4 - CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible.
+$AllowAccessToSMBWithDifferentSPN = $true     # CIS 2.3.9.5 - CIS recommends setting SPN validation to "Accept if provided by client." This can cause issues if you attempt to access a share using a different DNS name than the server currently recognizes. IE: If you have a non-domain joined computer and you access it using a DNS name that the server doesn't realize points to it, then the server will reject the connection. EG: Say you connect to "myserver.company.com", but the server's local name is just "myserver" and the server has no knowledge that it is also called "myserver.company.com" then the connection will be denied. (LanManServerSmbServerNameHardeningLevel)
 
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
   "batchuser" # you can remove this since it's just an example
@@ -1296,8 +1297,14 @@ function LanManServerEnableForcedLogOff {
 
 function LanManServerSmbServerNameHardeningLevel {
     #2.3.9.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Microsoft network server: Server SPN target name validation level
-    Write-Info "2.3.9.5 (L1) Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher"
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\SmbServerNameHardeningLevel" (,"4,1")
+    if ($AllowAccessToSMBWithDifferentSPN -eq $false) {
+        Write-Info "2.3.9.5 (L1) Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher"
+        SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\SmbServerNameHardeningLevel" (,"4,1")
+    }
+    else {
+        Write-Red "Skipping 2.3.9.5 (L1) Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher"
+        Write-Red "You enabled $AllowAccessToSMBWithDifferentSPN. This CIS configuration has been skipped so that SMB shares can be accessed by SPNs unknown to the server."
+    }
 }
 
 function LSAAnonymousNameDisabled {

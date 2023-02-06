@@ -1337,8 +1337,9 @@ function DisableDomainCreds {
       SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds" (,"4,1")
     }
     else {
-      Write-Red "Skipping 2.3.10.4 (L2) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled'"
-      Write-Red '- You enabled $AllowStoringPasswordsForTasks. This CIS configuration has been skipped so that passwords can be saved for automated tasks.'
+      Write-Red "Opposing 2.3.10.4 (L2) Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled'"
+      Write-Red '- You enabled $AllowStoringPasswordsForTasks. This CIS configuration has been altered so that passwords can be saved for automated tasks.'
+      SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\DisableDomainCreds" (,"4,0")
     }
 }
 

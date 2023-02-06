@@ -1133,10 +1133,19 @@ function LimitBlankPasswordConsole {
 
 function RenameAdministratorAccount {
     #2.3.1.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
-    Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
-    SetSecurityPolicy "NewAdministratorName" (,"`"$($AdminNewAccountName)`"")
-    Set-LocalUser -Name $AdminNewAccountName -Description " "
+    $RenamedUser = $AdminNewAccountName -replace "\d",""
+    $RenamedUser = Get-LocalUser -Name $RenamedUser*
+    if ($RenamedUser) {
+        Write-Red "Skipping 2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
+        Write-Red "- Administrator account already renamed: $($RenamedUser.Name)."
+    }
+    else {
+        Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
+        SetSecurityPolicy "NewAdministratorName" (,"`"$($AdminNewAccountName)`"")
+        Set-LocalUser -Name $AdminNewAccountName -Description ""
+    }
 }
+
 
 function RenameGuestAccount {
     #2.3.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename guest account

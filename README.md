@@ -1,3 +1,5 @@
+![alt text](https://github.com/eneerge/CIS-Windows-Server-2022/raw/main/hardening%20output.png?raw=true)
+
 # CIS-Windows-Server-2022
 This repository contains documents used to implement recommendations provided by the Center for Information Security (www.cisecurity.org). Both L1 and L2 configurations have been included.
 

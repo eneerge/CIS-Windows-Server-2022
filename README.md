@@ -25,7 +25,7 @@ To use:
   - `$AdditionalUsersToDenyNetworkAccess` - By default, the script denies CIS recommend users from accessing the server over the network. If you would like to restrict even more users, you can provide them here. If you know a user should not access this server over the network, you should include them here to increase your hardening.
   - `$AdditionalUsersToDenyRemoteDesktopServiceLogon` - Similar to the above option, deny additional users who should not be able to RDP into the server.
   - `$AdditionalUsersToDenyLocalLogon` - Similar to above, deny users who can log on locally. Good idea to include users that are used for only batch jobs who do not need to login to the machine directly.
-- Each CIS option can be commented out by placing a # in front of that option. Review the items in the $ExecutionList to see if there is any option you would like to disable.
+- If a compatibility assurance option is not available for your particular need, you can comment out any policy called by the $ExecutionList by placing a # in front of the policy option.
 - After configuring the above options, open an admin powershell (64-bit) window and run the script
 - Script will inform you that a new admin user will be created
 - Enter a new admin password for that user

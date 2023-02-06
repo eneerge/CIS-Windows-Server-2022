@@ -1149,9 +1149,17 @@ function RenameAdministratorAccount {
 
 function RenameGuestAccount {
     #2.3.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename guest account
-    Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
-    SetSecurityPolicy "NewGuestName" (,"`"$($GuestNewAccountName)`"")
-    Set-LocalUser -Name $GuestNewAccountName -Description " "
+    $RenamedUser = $GuestNewAccountName -replace "\d",""
+    $RenamedUser = Get-LocalUser -Name $RenamedUser*
+    if ($RenamedUser) {
+        Write-Red "Skipping 2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
+        Write-Red "- Guest account already renamed: $($RenamedUser.Name)."
+    }
+    else {
+        Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
+        SetSecurityPolicy "NewGuestName" (,"`"$($GuestNewAccountName)`"")
+        Set-LocalUser -Name $GuestNewAccountName -Description ""
+    }
 }
 
 function AuditForceSubCategoryPolicy {

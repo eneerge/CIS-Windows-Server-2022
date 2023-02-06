@@ -644,7 +644,9 @@ function ResetSec {
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
     $valueSet = $false
-    $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries)
+    if ($role -notlike "*LegalNotice*") {
+        $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries)
+    }
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"

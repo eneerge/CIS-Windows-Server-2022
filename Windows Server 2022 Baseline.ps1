@@ -1303,7 +1303,7 @@ function LanManServerSmbServerNameHardeningLevel {
     }
     else {
         Write-Red "Skipping 2.3.9.5 (L1) Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher"
-        Write-Red "You enabled $AllowAccessToSMBWithDifferentSPN. This CIS configuration has been skipped so that SMB shares can be accessed by SPNs unknown to the server."
+        Write-Red "- You enabled $AllowAccessToSMBWithDifferentSPN. This CIS configuration has been skipped so that SMB shares can be accessed by SPNs unknown to the server."
     }
 }
 

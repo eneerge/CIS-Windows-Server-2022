@@ -1907,7 +1907,7 @@ function LocalAccountTokenFilterPolicy {
 function ConfigureSMBv1ClientDriver  {
     #18.3.2 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\Configure SMB v1 client driver 
     Write-Info "18.3.2 (L1) Ensure 'Configure SMB v1 client driver' is set to 'Enabled: Disable driver (recommended)"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\mrxsmb1" "Start" "4" $REG_DWORD
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\mrxsmb10" "Start" "4" $REG_DWORD
 }
 
 function ConfigureSMBv1server {

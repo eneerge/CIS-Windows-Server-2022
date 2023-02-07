@@ -637,16 +637,39 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
     }
 }
 
+function DeleteRegistryValue([string] $path, [string] $key) {
+  $before = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+  if ($?) {
+    Write-Before "Was: $($before.$key)"
+  }
+  else {
+    Write-Before "Was: Not Defined!"
+  }
+
+  Remove-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+
+  $after = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+
+  if ($?) {
+    Write-After "Now: $($after.$key)"
+  }
+  else {
+    Write-After "Now: Not Defined!"
+  }
+
+  if ($before.$key -ne $after.$key) {
+    Write-Red "Value changed."
+    $global:valueChanges += "$path => $($before.$key) to $($after.$key)"
+  }
+}
+
 # Resets the security policy
 function ResetSec {
   secedit /configure /cfg C:\windows\inf\defltbase.inf /db C:\windows\system32\defltbase.sdb /verbose
 }
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
-    $valueSet = $false
-    if ($role -notlike "*LegalNotice*") {
-        $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries)
-    }
+    $valueSet = $false       
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"
@@ -666,14 +689,21 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     for($r =0; $r -lt $values.Length; $r++){
         # last iteration
         if($r -eq $values.Length -1) {
-            $config = "$($config)$($values[$r])"
+            if ($values[$r].trim() -ne "") {
+                $config = "$($config)$($values[$r])"
+            }
         } 
         # not last (include a comma)
         else {
-            $config = "$($config)$($values[$r]),"
+            if ($values[$r].trim() -ne "") {
+              $config = "$($config)$($values[$r]),"
+            }
         }
     }
-
+    if ($role -notlike "*LogonLegalNotice*") {
+        $config = $config.Trim(",")
+    }
+    
     for($i =0; $i -lt $lines.Length; $i++) {
         if($lines[$i].Contains($role)) {
             $before = $($lines[$i])
@@ -683,7 +713,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
             $valueSet = $true
             Write-After "Now: $config"
             
-            if ($config.Replace(" ","") -ne $before.Replace(" ","")) {
+            if ($config.Replace(" ","").Trim(",") -ne $before.Replace(" ","").Trim(",")) {
                 Write-Red "Value changed."
                 $global:valueChanges += "$before => $config"
             }
@@ -708,6 +738,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     }
 
     $lines | out-file ${env:appdata}\secpol.cfg
+
     secedit /configure /db c:\windows\security\local.sdb /cfg ${env:appdata}\secpol.cfg /areas $area
     CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
   
@@ -850,19 +881,19 @@ function  ResetAccountLockoutCounter
 function NoOneTrustCallerACM {
     #2.2.1 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access Credential Manager as a trusted caller
     Write-Info "2.2.1 (L1) Ensure 'Access Credential Manager as a trusted caller' is set to 'No One' (Scored)"
-    SetUserRight "SeTrustedCredManAccessPrivilege" ($SID_NOONE)
+    SetUserRight "SeTrustedCredManAccessPrivilege" @($SID_NOONE)
 }
 
 function AccessComputerFromNetwork {
     #2.2.3 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access this computer from the network
     Write-Info "2.2.3 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users"
-    SetUserRight "SeNetworkLogonRight" ($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
+    SetUserRight "SeNetworkLogonRight" @($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
 }
 
 function NoOneActAsPartOfOperatingSystem {
     #2.2.4 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Act as part of the operating system
     Write-Info "2.2.4 (L1) Ensure 'Act as part of the operating system' is set to 'No One' (Scored)"
-    SetUserRight "SeTcbPrivilege" ($SID_NOONE)
+    SetUserRight "SeTcbPrivilege" @($SID_NOONE)
 }
 
 function AdjustMemoryQuotasForProcess {
@@ -910,7 +941,7 @@ function CreatePagefile {
 function NoOneCreateTokenObject {
     #2.2.14 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create a token object
     Write-Info "2.2.14 (L1) Ensure 'Create a token object' is set to 'No One'"
-    SetUserRight "SeCreateTokenPrivilege" (,$SID_NOONE)
+    SetUserRight "SeCreateTokenPrivilege" @($SID_NOONE)
 }
 
 function CreateGlobalObjects {
@@ -922,7 +953,7 @@ function CreateGlobalObjects {
 function NoOneCreatesSharedObjects {
     #2.2.16 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create permanent shared objects
     Write-Info "2.2.16 (L1) Ensure 'Create permanent shared objects' is set to 'No One'"
-    SetUserRight "SeCreatePermanentPrivilege" (,$SID_NOONE)
+    SetUserRight "SeCreatePermanentPrivilege" @($SID_NOONE)
 }
 
 function CreateSymbolicLinks {
@@ -978,7 +1009,6 @@ function DenyGuestServiceLogon {
 function DenyGuestLocalLogon {
     #2.2.24 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on locally
     Write-Info "2.2.24 (L1) Ensure 'Deny log on locally' to include 'Guests'"
-    #SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS)
 
     $addlDenyUsers = ""
     if ($AdditionalUsersToDenyLocalLogon.Count -gt 0) {
@@ -1009,7 +1039,7 @@ function DenyRemoteDesktopServiceLogon {
 function NoOneTrustedForDelegation {
     #2.2.28 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Enable computer and user accounts to be trusted for delegation
     Write-Info "2.2.28 (L1) Ensure 'Enable computer and user accounts to be trusted for delegation' is set to 'No One'"
-    SetUserRight "SeDelegateSessionUserImpersonatePrivilege" (,$SID_NOONE)
+    SetUserRight "SeDelegateSessionUserImpersonatePrivilege" @($SID_NOONE)
 }
 
 function ForceShutdownFromRemoteSystem {
@@ -1045,19 +1075,19 @@ function LoadUnloadDeviceDrivers {
 function NoOneLockPagesInMemory {
     #2.2.35 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Lock pages in memory
     Write-Info "2.2.35 (L1) Ensure 'Lock pages in memory' is set to 'No One'"
-    SetUserRight "SeLockMemoryPrivilege" (,$SID_NOONE)
+    SetUserRight "SeLockMemoryPrivilege" @($SID_NOONE)
 }
 
 function ManageAuditingAndSecurity {
     #2.2.38 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Manage auditing and security log
     Write-Info "2.2.38 (L1) Ensure 'Manage auditing and security log' is set to 'Administrators'"
-    SetUserRight "SeSecurityPrivilege" (,$SID_ADMINISTRATORS)
+    SetUserRight "SeSecurityPrivilege" @($SID_ADMINISTRATORS)
 }
 
 function NoOneModifiesObjectLabel {
     #2.2.39 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Modify an object label
     Write-Info "2.2.39 (L1) Ensure 'Modify an object label' is set to 'No One'"
-    SetUserRight "SeRelabelPrivilege" (,$SID_NOONE)
+    SetUserRight "SeRelabelPrivilege" @($SID_NOONE)
 }
 
 function FirmwareEnvValues {
@@ -1935,7 +1965,7 @@ function LocalAccountTokenFilterPolicy {
 function ConfigureSMBv1ClientDriver  {
     #18.3.2 => Computer Configuration\Policies\Administrative Templates\MS Security Guide\Configure SMB v1 client driver 
     Write-Info "18.3.2 (L1) Ensure 'Configure SMB v1 client driver' is set to 'Enabled: Disable driver (recommended)"
-    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\mrxsmb1" "Start" "4" $REG_DWORD
+    SetRegistry "HKLM:\SYSTEM\CurrentControlSet\Services\mrxsmb10" "Start" "4" $REG_DWORD
 }
 
 function ConfigureSMBv1server {
@@ -2260,7 +2290,7 @@ function EnableCdp {
 function DisableBkGndGroupPolicy {
     #18.8.21.5 => Computer Configuration\Policies\Administrative Templates\System\Group Policy\Turn off background refresh of Group Policy 
     Write-Info "18.8.21.5 (L1) Ensure 'Turn off background refresh of Group Policy' is set to 'Disabled' "
-    SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" "DisableBkGndGroupPolicy" "0" $REG_DWORD
+    DeleteRegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" "DisableBkGndGroupPolicy"
 }
 
 function DisableWebPnPDownload {

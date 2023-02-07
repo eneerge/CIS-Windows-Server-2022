@@ -669,8 +669,7 @@ function ResetSec {
 }
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
-    $valueSet = $false
-    $values = $values.Split('',[System.StringSplitOptions]::RemoveEmptyEntries)
+    $valueSet = $false       
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"
@@ -690,14 +689,21 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     for($r =0; $r -lt $values.Length; $r++){
         # last iteration
         if($r -eq $values.Length -1) {
-            $config = "$($config)$($values[$r])"
+            if ($values[$r].trim() -ne "") {
+                $config = "$($config)$($values[$r])"
+            }
         } 
         # not last (include a comma)
         else {
-            $config = "$($config)$($values[$r]),"
+            if ($values[$r].trim() -ne "") {
+              $config = "$($config)$($values[$r]),"
+            }
         }
     }
-
+    if ($role -notlike "*LogonLegalNotice*") {
+        $config = $config.Trim(",")
+    }
+    
     for($i =0; $i -lt $lines.Length; $i++) {
         if($lines[$i].Contains($role)) {
             $before = $($lines[$i])
@@ -707,7 +713,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
             $valueSet = $true
             Write-After "Now: $config"
             
-            if ($config.Replace(" ","") -ne $before.Replace(" ","")) {
+            if ($config.Replace(" ","").Trim(",") -ne $before.Replace(" ","").Trim(",")) {
                 Write-Red "Value changed."
                 $global:valueChanges += "$before => $config"
             }
@@ -732,6 +738,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     }
 
     $lines | out-file ${env:appdata}\secpol.cfg
+
     secedit /configure /db c:\windows\security\local.sdb /cfg ${env:appdata}\secpol.cfg /areas $area
     CheckError $? "Configuring '$($area)' via $(${env:appdata})\secpol.cfg' failed."
   

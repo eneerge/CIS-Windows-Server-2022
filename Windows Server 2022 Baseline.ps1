@@ -637,6 +637,32 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
     }
 }
 
+function DeleteRegistryValue([string] $path, [string] $key) {
+  $before = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+  if ($?) {
+    Write-Before "Was: $($before.$key)"
+  }
+  else {
+    Write-Before "Was: Not Defined!"
+  }
+
+  Remove-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+
+  $after = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+
+  if ($?) {
+    Write-After "Now: $($after.$key)"
+  }
+  else {
+    Write-After "Now: Not Defined!"
+  }
+
+  if ($before.$key -ne $after.$key) {
+    Write-Red "Value changed."
+    $global:valueChanges += "$path => $($before.$key) to $($after.$key)"
+  }
+}
+
 # Resets the security policy
 function ResetSec {
   secedit /configure /cfg C:\windows\inf\defltbase.inf /db C:\windows\system32\defltbase.sdb /verbose
@@ -2232,7 +2258,7 @@ function EnableCdp {
 function DisableBkGndGroupPolicy {
     #18.8.21.5 => Computer Configuration\Policies\Administrative Templates\System\Group Policy\Turn off background refresh of Group Policy 
     Write-Info "18.8.21.5 (L1) Ensure 'Turn off background refresh of Group Policy' is set to 'Disabled' "
-    SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" "DisableBkGndGroupPolicy" "0" $REG_DWORD
+    DeleteRegistryValue "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" "DisableBkGndGroupPolicy"
 }
 
 function DisableWebPnPDownload {

@@ -754,9 +754,18 @@ function SetSecurityPolicy([string]$role, [string[]] $values, $enforceCreation=$
 }
 
 function CreateUserAccount([string] $username, [securestring] $password, [bool] $isAdmin=$false) {
-    New-LocalUser -Name $username -Password $password -Description "" -AccountNeverExpires -PasswordNeverExpires
-    if($isAdmin -eq $true) {
-        Add-LocalGroupMember -Group "Administrators" -Member $username
+    $NewLocalAdminExists = Get-LocalUser -Name $username -ErrorAction SilentlyContinue
+    if ($NewLocalAdminExists) {
+        Write-Red "Skipping creating new Administrator account"
+        Write-Red "- New Administrator account already exists: $($username)"
+    }
+    else {
+        New-LocalUser -Name $username -Password $password -Description "" -AccountNeverExpires -PasswordNeverExpires
+        Write-Info "New Administrator account created: $($username)."
+        if($isAdmin -eq $true) {
+            Add-LocalGroupMember -Group "Administrators" -Member $username
+            Write-Info "Administrator account $($username) is now member of the local Administrators group."
+        }
     }
 }
 
@@ -1156,16 +1165,33 @@ function LimitBlankPasswordConsole {
 
 function RenameAdministratorAccount {
     #2.3.1.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
-    Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
-    SetSecurityPolicy "NewAdministratorName" (,"`"$($AdminNewAccountName)`"")
-    Set-LocalUser -Name $AdminNewAccountName -Description " "
+    $RenamedUser = $AdminNewAccountName -replace "\d",""
+    $RenamedUser = Get-LocalUser -Name $RenamedUser*
+    if ($RenamedUser) {
+        Write-Red "Skipping 2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
+        Write-Red "- Administrator account already renamed: $($RenamedUser.Name)."
+    }
+    else {
+        Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
+        SetSecurityPolicy "NewAdministratorName" (,"`"$($AdminNewAccountName)`"")
+        Set-LocalUser -Name $AdminNewAccountName -Description ""
+    }
 }
+
 
 function RenameGuestAccount {
     #2.3.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename guest account
-    Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
-    SetSecurityPolicy "NewGuestName" (,"`"$($GuestNewAccountName)`"")
-    Set-LocalUser -Name $GuestNewAccountName -Description " "
+    $RenamedUser = $GuestNewAccountName -replace "\d",""
+    $RenamedUser = Get-LocalUser -Name $RenamedUser*
+    if ($RenamedUser) {
+        Write-Red "Skipping 2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
+        Write-Red "- Guest account already renamed: $($RenamedUser.Name)."
+    }
+    else {
+        Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
+        SetSecurityPolicy "NewGuestName" (,"`"$($GuestNewAccountName)`"")
+        Set-LocalUser -Name $GuestNewAccountName -Description ""
+    }
 }
 
 function AuditForceSubCategoryPolicy {

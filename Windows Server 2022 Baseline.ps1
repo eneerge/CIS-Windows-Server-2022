@@ -872,19 +872,19 @@ function  ResetAccountLockoutCounter
 function NoOneTrustCallerACM {
     #2.2.1 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access Credential Manager as a trusted caller
     Write-Info "2.2.1 (L1) Ensure 'Access Credential Manager as a trusted caller' is set to 'No One' (Scored)"
-    SetUserRight "SeTrustedCredManAccessPrivilege" ($SID_NOONE)
+    SetUserRight "SeTrustedCredManAccessPrivilege" @($SID_NOONE)
 }
 
 function AccessComputerFromNetwork {
     #2.2.3 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access this computer from the network
     Write-Info "2.2.3 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users"
-    SetUserRight "SeNetworkLogonRight" ($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
+    SetUserRight "SeNetworkLogonRight" @($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
 }
 
 function NoOneActAsPartOfOperatingSystem {
     #2.2.4 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Act as part of the operating system
     Write-Info "2.2.4 (L1) Ensure 'Act as part of the operating system' is set to 'No One' (Scored)"
-    SetUserRight "SeTcbPrivilege" ($SID_NOONE)
+    SetUserRight "SeTcbPrivilege" @($SID_NOONE)
 }
 
 function AdjustMemoryQuotasForProcess {
@@ -932,7 +932,7 @@ function CreatePagefile {
 function NoOneCreateTokenObject {
     #2.2.14 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create a token object
     Write-Info "2.2.14 (L1) Ensure 'Create a token object' is set to 'No One'"
-    SetUserRight "SeCreateTokenPrivilege" (,$SID_NOONE)
+    SetUserRight "SeCreateTokenPrivilege" @($SID_NOONE)
 }
 
 function CreateGlobalObjects {
@@ -944,7 +944,7 @@ function CreateGlobalObjects {
 function NoOneCreatesSharedObjects {
     #2.2.16 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Create permanent shared objects
     Write-Info "2.2.16 (L1) Ensure 'Create permanent shared objects' is set to 'No One'"
-    SetUserRight "SeCreatePermanentPrivilege" (,$SID_NOONE)
+    SetUserRight "SeCreatePermanentPrivilege" @($SID_NOONE)
 }
 
 function CreateSymbolicLinks {
@@ -1000,7 +1000,6 @@ function DenyGuestServiceLogon {
 function DenyGuestLocalLogon {
     #2.2.24 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny log on locally
     Write-Info "2.2.24 (L1) Ensure 'Deny log on locally' to include 'Guests'"
-    #SetUserRight "SeDenyInteractiveLogonRight" (,$SID_GUESTS)
 
     $addlDenyUsers = ""
     if ($AdditionalUsersToDenyLocalLogon.Count -gt 0) {
@@ -1031,7 +1030,7 @@ function DenyRemoteDesktopServiceLogon {
 function NoOneTrustedForDelegation {
     #2.2.28 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Enable computer and user accounts to be trusted for delegation
     Write-Info "2.2.28 (L1) Ensure 'Enable computer and user accounts to be trusted for delegation' is set to 'No One'"
-    SetUserRight "SeDelegateSessionUserImpersonatePrivilege" (,$SID_NOONE)
+    SetUserRight "SeDelegateSessionUserImpersonatePrivilege" @($SID_NOONE)
 }
 
 function ForceShutdownFromRemoteSystem {
@@ -1067,19 +1066,19 @@ function LoadUnloadDeviceDrivers {
 function NoOneLockPagesInMemory {
     #2.2.35 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Lock pages in memory
     Write-Info "2.2.35 (L1) Ensure 'Lock pages in memory' is set to 'No One'"
-    SetUserRight "SeLockMemoryPrivilege" (,$SID_NOONE)
+    SetUserRight "SeLockMemoryPrivilege" @($SID_NOONE)
 }
 
 function ManageAuditingAndSecurity {
     #2.2.38 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Manage auditing and security log
     Write-Info "2.2.38 (L1) Ensure 'Manage auditing and security log' is set to 'Administrators'"
-    SetUserRight "SeSecurityPrivilege" (,$SID_ADMINISTRATORS)
+    SetUserRight "SeSecurityPrivilege" @($SID_ADMINISTRATORS)
 }
 
 function NoOneModifiesObjectLabel {
     #2.2.39 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Modify an object label
     Write-Info "2.2.39 (L1) Ensure 'Modify an object label' is set to 'No One'"
-    SetUserRight "SeRelabelPrivilege" (,$SID_NOONE)
+    SetUserRight "SeRelabelPrivilege" @($SID_NOONE)
 }
 
 function FirmwareEnvValues {

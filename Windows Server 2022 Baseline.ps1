@@ -1367,7 +1367,6 @@ function LanManServerSmbServerNameHardeningLevel {
         SetSecurityPolicy "MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\SmbServerNameHardeningLevel" (,"4,0")
     }
 }
-}
 
 function LSAAnonymousNameDisabled {
     #2.3.10.1 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network access: Allow anonymous SID/Name translation

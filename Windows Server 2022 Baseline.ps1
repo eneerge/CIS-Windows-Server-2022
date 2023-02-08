@@ -488,15 +488,29 @@ $AdminNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "Lo
 $GuestNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-501'").Name
 
 # If the "RenameAdministratorAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
-if ($ExecutionList.Contains("RenameAdministratorAccount")) {
-  $seed_admin = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system.
-  $AdminNewAccountName = "DisabledUser$($seed_admin)"
+if ($ExecutionList.Contains("RenameAdministratorAccount")) {    
+    $seed_admin = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system.
+    $AdminNewAccountName = "DisabledAdmin$($seed_admin)"
+
+    $RenamedAdmin = $AdminNewAccountName -replace "\d",""
+    $RenamedAdmin = Get-LocalUser -Name $RenamedAdmin*
+
+    if ($RenamedAdmin) {
+        $AdminNewAccountName = $RenamedAdmin.Name
+    }
 }
 
 # If the "RenameGuestAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
 if ($ExecutionList.Contains("RenameGuestAccount")) {
-  $seed_guest = Get-Random -Minimum 1000 -Maximum 9999 #Randomize the new admin and guest accounts on each system.
-  $GuestNewAccountName = "DisabledUserSec$($seed_guest)"  
+    $seed_guest = Get-Random -Minimum 1000 -Maximum 9999 #Randomize the new admin and guest accounts on each system.
+    $GuestNewAccountName = "DisabledGuest$($seed_guest)"
+
+    $RenamedGuest = $GuestNewAccountName -replace "\d",""
+    $RenamedGuest = Get-LocalUser -Name $RenamedGuest*
+
+    if ($RenamedGuest) {
+        $GuestNewAccountName = $RenamedGuest.Name
+    }
 }
 
 # Ensure the additional users specified for settings exist to prevent issues with applying policy
@@ -1165,11 +1179,9 @@ function LimitBlankPasswordConsole {
 
 function RenameAdministratorAccount {
     #2.3.1.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
-    $RenamedUser = $AdminNewAccountName -replace "\d",""
-    $RenamedUser = Get-LocalUser -Name $RenamedUser*
-    if ($RenamedUser) {
+    if ($RenamedAdmin) {
         Write-Red "Skipping 2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
-        Write-Red "- Administrator account already renamed: $($RenamedUser.Name)."
+        Write-Red "- Administrator account already renamed: $($RenamedAdmin.Name)."
     }
     else {
         Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
@@ -1178,14 +1190,11 @@ function RenameAdministratorAccount {
     }
 }
 
-
 function RenameGuestAccount {
     #2.3.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename guest account
-    $RenamedUser = $GuestNewAccountName -replace "\d",""
-    $RenamedUser = Get-LocalUser -Name $RenamedUser*
-    if ($RenamedUser) {
+    if ($RenamedGuest) {
         Write-Red "Skipping 2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
-        Write-Red "- Guest account already renamed: $($RenamedUser.Name)."
+        Write-Red "- Guest account already renamed: $($RenamedGuest.Name)."
     }
     else {
         Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"

@@ -3205,11 +3205,21 @@ function WindowsUpdateQuality {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" "DeferQualityUpdatesPeriodInDays" "0" $REG_DWORD
 }
 
-function ValidatePasswords([string] $pass1, [string] $pass2) {
-    if($pass1 -ne $pass2) { return $False }
-    if($pass1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!%*?&])[A-Za-z\d@$#^!%*?&]{15,}$") { return $False }
-    return $True;
+function ValidatePasswords([SecureString] $pass1, [SecureString] $pass2) {
+    $plaintext1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($pass1))
+    $plaintext2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($pass2))
+
+    if ($plaintext1 -ne $plaintext2) {
+        return $false
+    }
+
+    if ($plaintext1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!_%*?&])[A-Za-z\d@$#^!_%*?&]{15,}$") {
+        return $false
+    }
+
+    return $frue
 }
+
 if ([Environment]::Is64BitProcess -ne [Environment]::Is64BitOperatingSystem)
 {
     Write-Error "You must execute this script on a x64 shell"
@@ -3222,18 +3232,19 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
     $temp_pass2 = ""
     $invalid_pass = $true
 
-    if($NewLocalAdminUsername -ne "") {
-        if($NewLocalAdminPswd -eq "") {
-            Write-Error "NewLocalAdminUsername set but NewLocalAdminPasswd not set."
-            Write-Error "Please use -NewLocalAdminPassword parameter to set the password!"
+    if($NewLocalAdminUsername) {
+        if(!($NewLocalAdminPswd)) {
+            Write-Red "NewLocalAdminUsername set but NewLocalAdminPasswd not set."
+            Write-Red "Please use -NewLocalAdminPassword parameter to set the password."
+            Write-Red "Aborted."
             return
         } else {
             if((ValidatePasswords $NewLocalAdminPswd $NewLocalAdminPswd) -eq $False) {
-                Write-Error "NewLocalAdminPassword does not fullfill the minimum security requirements"
-                Write-Info "Your passwords must contain at least 15 characters, capital letters, numbers and symbols"
+                Write-Red "NewLocalAdminPassword does not fullfill the minimum security requirements."
+                Write-Info "Your passwords must contain at least 15 characters, capital letters, numbers and symbols."
                 return 1;
             } else {
-                $temp_pass1 = ConvertTo-SecureString $NewLocalAdminPassword -AsPlainText -Force 
+                $NewLocalAdminPassword = ConvertTo-SecureString $NewLocalAdminPassword -AsPlainText -Force 
             }
         }
     } else {
@@ -3241,14 +3252,14 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
             Write-Info "I will create a new Administrator account, you need to specify the new account password."
             Write-Info "Your password must contain at least 15 characters, capital letters, numbers and symbols"
             Write-Info "Please enter the new password:"
-            $temp_pass1 = Read-Host
+            $temp_pass1 = Read-Host -AsSecureString
             Write-Info "Please repeat the new password:"
-            $temp_pass2 = Read-Host 
+            $temp_pass2 = Read-Host -AsSecureString
             $invalid_pass = ValidatePasswords $temp_pass1 $temp_pass2 
             if($invalid_pass -eq $false) {
-                Write-Error "Your passwords do not match or do not follow the minimum complexity requirements, try again."
+                Write-Red "Your passwords do not match or do not follow the minimum complexity requirements, try again."
             } else {
-                $NewLocalAdminPassword = ConvertTo-SecureString $temp_pass1 -AsPlainText -Force 
+                $NewLocalAdminPassword = $temp_pass1
             }
         } while($invalid_pass -eq $false)
     }

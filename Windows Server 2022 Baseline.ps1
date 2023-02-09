@@ -3233,13 +3233,13 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
     $invalid_pass = $true
 
     if($NewLocalAdminUsername) {
-        if(!($NewLocalAdminPswd)) {
+        if(!($NewLocalAdminPassword)) {
             Write-Red "NewLocalAdminUsername set but NewLocalAdminPasswd not set."
             Write-Red "Please use -NewLocalAdminPassword parameter to set the password."
             Write-Red "Aborted."
             return
         } else {
-            if((ValidatePasswords $NewLocalAdminPswd $NewLocalAdminPswd) -eq $False) {
+            if((ValidatePasswords $NewLocalAdminPassword $NewLocalAdminPassword) -eq $False) {
                 Write-Red "NewLocalAdminPassword does not fullfill the minimum security requirements."
                 Write-Info "Your passwords must contain at least 15 characters, capital letters, numbers and symbols."
                 return 1;

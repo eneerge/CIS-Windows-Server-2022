@@ -488,15 +488,29 @@ $AdminNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "Lo
 $GuestNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-501'").Name
 
 # If the "RenameAdministratorAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
-if ($ExecutionList.Contains("RenameAdministratorAccount")) {
-  $seed_admin = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system.
-  $AdminNewAccountName = "DisabledUser$($seed_admin)"
+if ($ExecutionList.Contains("RenameAdministratorAccount")) {    
+    $seed_admin = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system.
+    $AdminNewAccountName = "DisabledAdmin$($seed_admin)"
+
+    $RenamedAdmin = $AdminNewAccountName -replace "\d",""
+    $RenamedAdmin = Get-LocalUser -Name $RenamedAdmin*
+
+    if ($RenamedAdmin) {
+        $AdminNewAccountName = $RenamedAdmin.Name
+    }
 }
 
 # If the "RenameGuestAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
 if ($ExecutionList.Contains("RenameGuestAccount")) {
-  $seed_guest = Get-Random -Minimum 1000 -Maximum 9999 #Randomize the new admin and guest accounts on each system.
-  $GuestNewAccountName = "DisabledUserSec$($seed_guest)"  
+    $seed_guest = Get-Random -Minimum 1000 -Maximum 9999 #Randomize the new admin and guest accounts on each system.
+    $GuestNewAccountName = "DisabledGuest$($seed_guest)"
+
+    $RenamedGuest = $GuestNewAccountName -replace "\d",""
+    $RenamedGuest = Get-LocalUser -Name $RenamedGuest*
+
+    if ($RenamedGuest) {
+        $GuestNewAccountName = $RenamedGuest.Name
+    }
 }
 
 # Ensure the additional users specified for settings exist to prevent issues with applying policy
@@ -1165,11 +1179,9 @@ function LimitBlankPasswordConsole {
 
 function RenameAdministratorAccount {
     #2.3.1.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
-    $RenamedUser = $AdminNewAccountName -replace "\d",""
-    $RenamedUser = Get-LocalUser -Name $RenamedUser*
-    if ($RenamedUser) {
+    if ($RenamedAdmin) {
         Write-Red "Skipping 2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
-        Write-Red "- Administrator account already renamed: $($RenamedUser.Name)."
+        Write-Red "- Administrator account already renamed: $($RenamedAdmin.Name)."
     }
     else {
         Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
@@ -1178,14 +1190,11 @@ function RenameAdministratorAccount {
     }
 }
 
-
 function RenameGuestAccount {
     #2.3.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename guest account
-    $RenamedUser = $GuestNewAccountName -replace "\d",""
-    $RenamedUser = Get-LocalUser -Name $RenamedUser*
-    if ($RenamedUser) {
+    if ($RenamedGuest) {
         Write-Red "Skipping 2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
-        Write-Red "- Guest account already renamed: $($RenamedUser.Name)."
+        Write-Red "- Guest account already renamed: $($RenamedGuest.Name)."
     }
     else {
         Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
@@ -3196,11 +3205,21 @@ function WindowsUpdateQuality {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" "DeferQualityUpdatesPeriodInDays" "0" $REG_DWORD
 }
 
-function ValidatePasswords([string] $pass1, [string] $pass2) {
-    if($pass1 -ne $pass2) { return $False }
-    if($pass1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!%*?&])[A-Za-z\d@$#^!%*?&]{15,}$") { return $False }
-    return $True;
+function ValidatePasswords([SecureString] $pass1, [SecureString] $pass2) {
+    $plaintext1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($pass1))
+    $plaintext2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($pass2))
+
+    if ($plaintext1 -ne $plaintext2) {
+        return $false
+    }
+
+    if ($plaintext1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!_%*?&])[A-Za-z\d@$#^!_%*?&]{15,}$") {
+        return $false
+    }
+
+    return $frue
 }
+
 if ([Environment]::Is64BitProcess -ne [Environment]::Is64BitOperatingSystem)
 {
     Write-Error "You must execute this script on a x64 shell"
@@ -3213,18 +3232,19 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
     $temp_pass2 = ""
     $invalid_pass = $true
 
-    if($NewLocalAdminUsername -ne "") {
-        if($NewLocalAdminPswd -eq "") {
-            Write-Error "NewLocalAdminUsername set but NewLocalAdminPasswd not set."
-            Write-Error "Please use -NewLocalAdminPassword parameter to set the password!"
+    if($NewLocalAdminUsername) {
+        if(!($NewLocalAdminPassword)) {
+            Write-Red "NewLocalAdminUsername set but NewLocalAdminPasswd not set."
+            Write-Red "Please use -NewLocalAdminPassword parameter to set the password."
+            Write-Red "Aborted."
             return
         } else {
-            if((ValidatePasswords $NewLocalAdminPswd $NewLocalAdminPswd) -eq $False) {
-                Write-Error "NewLocalAdminPassword does not fullfill the minimum security requirements"
-                Write-Info "Your passwords must contain at least 15 characters, capital letters, numbers and symbols"
+            if((ValidatePasswords $NewLocalAdminPassword $NewLocalAdminPassword) -eq $False) {
+                Write-Red "NewLocalAdminPassword does not fullfill the minimum security requirements."
+                Write-Info "Your passwords must contain at least 15 characters, capital letters, numbers and symbols."
                 return 1;
             } else {
-                $temp_pass1 = ConvertTo-SecureString $NewLocalAdminPassword -AsPlainText -Force 
+                $NewLocalAdminPassword = ConvertTo-SecureString $NewLocalAdminPassword -AsPlainText -Force 
             }
         }
     } else {
@@ -3232,14 +3252,14 @@ if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::G
             Write-Info "I will create a new Administrator account, you need to specify the new account password."
             Write-Info "Your password must contain at least 15 characters, capital letters, numbers and symbols"
             Write-Info "Please enter the new password:"
-            $temp_pass1 = Read-Host
+            $temp_pass1 = Read-Host -AsSecureString
             Write-Info "Please repeat the new password:"
-            $temp_pass2 = Read-Host 
+            $temp_pass2 = Read-Host -AsSecureString
             $invalid_pass = ValidatePasswords $temp_pass1 $temp_pass2 
             if($invalid_pass -eq $false) {
-                Write-Error "Your passwords do not match or do not follow the minimum complexity requirements, try again."
+                Write-Red "Your passwords do not match or do not follow the minimum complexity requirements, try again."
             } else {
-                $NewLocalAdminPassword = ConvertTo-SecureString $temp_pass1 -AsPlainText -Force 
+                $NewLocalAdminPassword = $temp_pass1
             }
         } while($invalid_pass -eq $false)
     }

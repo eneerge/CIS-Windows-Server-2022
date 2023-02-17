@@ -1,45 +1,68 @@
-param([string] $NewLocalAdminUsername = "",[string] $NewLocalAdminPswd = "", [string] $LegalNoticeMessageFile = "", [string] $ExecutionListFile = "")
-
 # CIS Microsoft Windows Server 2022 Benchmark based on https://workbench.cisecurity.org/benchmarks/8932
 # Script by Evan Greene from https://github.com/eneerge/CIS-Windows-Server-2022
-
-# Original script from https://github.com/viniciusmiguel/CIS-Microsoft-Windows-Server-2019-Benchmark (deleted by author)
 
 ##########################################################################################################
 $LogonLegalNoticeMessageTitle = ""
 $LogonLegalNoticeMessage = ""
 
 # Set the max size of log files
-$WindowsFirewallLogSize = 32*1024 # Default for script is 32MB
+$WindowsFirewallLogSize = 4*1024*1024 # Default for script is 4GB
 $EventLogMaxFileSize = 4*1024*1024 # Default 4GB (for each log)
+$WindowsDefenderLogSize = 1024MB
 
-$AdminAccountName = "Administrator" # Built-in admin account (disabled)
-$GuestAccountName = "NoGuest" # Build-in guest account (disabled)
-$NewLocalAdmin = "User" # Active admin account
+$AdminAccountPrefix = "DisabledUser" # Built-in admin account prefix. Numbers will be added to the end so that the built in admin account will be different on each server (account will be disabled after renaming)
+$GuestAccountPrefix = "DisabledUser" # Build-in guest account prefix. Numbers will be added to the end so that the built in admin account will be different on each server (account will be disabled after renaming)
+$NewLocalAdmin = "User" # Active admin account username (Local admin account that will be used to manage the server. Account will be active after script is run. This is not a prefix. It's the full account username)
 
-# Compatibility Assurance / Exceptions / Additional Configurations
+#########################################################
+# Compatibility Assurance 
+# Set to true to ensure implemented policy supports functionality of a particular software
+# Setting these to true will override any configurations you set in the "Policy Configuration" section below.
+#########################################################
 $AllowRDPFromLocalAccount = $true;            # CIS 2.2.26 - Set to true to oppose CIS recommendation and allow RDP from local account. This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments. (DenyRemoteDesktopServiceLogon)
 $AllowRDPClipboard = $true;                   # CIS 18.9.65.3.3.3 - Set to true to oppose CIS recommendation and allow drive redirection so that copy/paste works to RDP sessions. This enables "Drive Redirection" feature so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session. (TerminalServicesfDisableCdm)
 $AllowDefenderMAPS = $true;                   # CIS 18.9.47.4.2 - Set to true to oppose CIS recommendation and enable MAPS. CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation. (SpynetReporting)
 $AllowStoringPasswordsForTasks = $true        # CIS 2.3.10.4 - Set to true to oppose CIS recommendation and allow storing of passwords. CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible. (DisableDomainCreds)
 $AllowAccessToSMBWithDifferentSPN = $true     # CIS 2.3.9.5 - Set to true to oppose CIS recommendation and allow SMB over unknown SPN. CIS recommends setting SPN validation to "Accept if provided by client." This can cause issues if you attempt to access a share using a different DNS name than the server currently recognizes. IE: If you have a non-domain joined computer and you access it using a DNS name that the server doesn't realize points to it, then the server will reject the connection. EG: Say you connect to "myserver.company.com", but the server's local name is just "myserver" and the server has no knowledge that it is also called "myserver.company.com" then the connection will be denied. (LanManServerSmbServerNameHardeningLevel)
-$DontSetEnableLUAForVeeamBackup = $false      # CIS 2.3.17.6 - Set to true to oppose CIS recommendation and don't run all admins in Admin Approval Mode. CIS recommends setting this registry value to 1 so that all Admin users including the built in account must run in Admin Approval Mode (UAC popup always when running admin). However, this breaks Veeam Backup. See: https://www.veeam.com/kb4185
-$DontSetTokenFilterPolicyForPSExec = $false   # CIS 18.3.1 - Set to true to oppose CIS recommendation and don't set require UAC for admins logging in over a network. Highly recommended to leave this $false unless you are legitimately using PSExec for any reason on the server. In addition, EnableLUA should also be disabled. See https://www.brandonmartinez.com/2013/04/24/resolve-access-is-denied-using-psexec-with-a-local-admin-account/
+$DontSetEnableLUAForVeeamBackup = $false       # CIS 2.3.17.6 - Set to true to oppose CIS recommendation and don't run all admins in Admin Approval Mode. CIS recommends setting this registry value to 1 so that all Admin users including the built in account must run in Admin Approval Mode (UAC popup always when running admin). However, this breaks Veeam Backup. See: https://www.veeam.com/kb4185
+$DontSetTokenFilterPolicyForPSExec = $false    # CIS 18.3.1 - Set to true to oppose CIS recommendation and don't set require UAC for admins logging in over a network. Highly recommended to leave this $false unless you are legitimately using PSExec for any reason on the server. In addition, EnableLUA should also be disabled. See https://www.brandonmartinez.com/2013/04/24/resolve-access-is-denied-using-psexec-with-a-local-admin-account/
 
+#########################################################
+# Attack Surface Reduction Exclusions (Recommended)
+# ASR will likely fire on legitimate software. To ensure server software runs properly, add exclusions to the executables or folders here.
+#########################################################
+$AttackSurfaceReductionExclusions = @(
+    # Folder Example
+    "C:\Program Files\RMM"
+    
+    # File Example
+    "C:\some\folder\some.exe"
+)
+
+#########################################################
+# Increase User Hardening (Optional)
+# Add additional users that should not have a specific right to increase the hardening of this script.
+#########################################################
 $AdditionalUsersToDenyNetworkAccess = @(      #CIS 2.2.21 - This adds additional users to the "Deny access to this computer from the network" to add more than guest and built-in admin
-  "batchuser" # you can remove this since it's just an example
+  "batchuser"
 )
 $AdditionalUsersToDenyRemoteDesktopServiceLogon = @(  #CIS 2.2.26 - This adds additional users to the "Deny log on through Remote Desktop Services" if you want to exclude more than just the guest user
-  "batchuser" # you can remove this since it's just an example
-  ,"batchadmin" # you can remove this since it's just an example
+  "batchuser"
+  ,"batchadmin"
 )
 $AdditionalUsersToDenyLocalLogon = @(         #CIS 2.2.24 - This adds additional users to the "Deny log on locally" if you want to exclude more than just the "guest" user.
-  "batchuser" # you can remove this since it's just an example
-  ,"batchadmin" # you can remove this since it's just an example
+  "batchuser"
+  ,"batchadmin"
 )
 
-#IF YOU HAVE SPECIAL SECURITY REQUIREMENTS YOU CAN DISABLE POLICIES BELLOW
+#########################################################
+# Policy Configuration
+# Comment out any policy you do not wish to implement.
+# Note that the "Compatibility Assurance" section you configured above above may override your wishes to ensure software your software works.
+#########################################################
 $ExecutionList = @(
+    "CreateASRExclusions"                                               # This deletes and readds the attack surface reduction exclusions configured in the script.
+    "SetWindowsDefenderLogSize"                                         # Sets the defender log size as configured in the top of this script
     #KEEP THESE IN THE BEGINING
     "CreateNewLocalAdminAccount",                                       #Mandatory otherwise the system access is lost
     "RenameAdministratorAccount",                                       #2.3.1.5 
@@ -480,38 +503,11 @@ $ExecutionList = @(
 
 )
 
-if($NewLocalAdminPswd -ne "") {
-    $NewLocalAdminPassword = ConvertTo-SecureString $NewLocalAdminPswd -AsPlainText -Force
-}
 
-$AdminNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-500'").Name
-$GuestNewAccountName = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-501'").Name
-
-# If the "RenameAdministratorAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
-if ($ExecutionList.Contains("RenameAdministratorAccount")) {    
-    $seed_admin = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system.
-    $AdminNewAccountName = "DisabledAdmin$($seed_admin)"
-
-    $RenamedAdmin = $AdminNewAccountName -replace "\d",""
-    $RenamedAdmin = Get-LocalUser -Name $RenamedAdmin*
-
-    if ($RenamedAdmin) {
-        $AdminNewAccountName = $RenamedAdmin.Name
-    }
-}
-
-# If the "RenameGuestAccount" option is not enabled, we need to get the current admin account name to apply the settings of this script
-if ($ExecutionList.Contains("RenameGuestAccount")) {
-    $seed_guest = Get-Random -Minimum 1000 -Maximum 9999 #Randomize the new admin and guest accounts on each system.
-    $GuestNewAccountName = "DisabledGuest$($seed_guest)"
-
-    $RenamedGuest = $GuestNewAccountName -replace "\d",""
-    $RenamedGuest = Get-LocalUser -Name $RenamedGuest*
-
-    if ($RenamedGuest) {
-        $GuestNewAccountName = $RenamedGuest.Name
-    }
-}
+# End configuration
+##########################################################################################################
+# DO NOT CHANGE CODE BELLOW THIS LINE IF YOU ARE NOT 100% SURE ABOUT WHAT YOU ARE DOING!
+##########################################################################################################
 
 # Ensure the additional users specified for settings exist to prevent issues with applying policy
 $existingUsers = (Get-LocalUser).Name
@@ -530,9 +526,6 @@ foreach ($u in $AdditionalUsersToDenyNetworkAccess) {
     $AdditionalUsersToDenyNetworkAccess = $AdditionalUsersToDenyNetworkAccess | Where-Object { $_ -ne $u }
   }
 }
-
-#DO NOT CHANGE CODE BELLOW THIS LINE IF YOU ARE NOT 100% SURE ABOUT WHAT YOU ARE DOING!
-##########################################################################################################
 
 #WINDOWS SID CONSTANTS
 #https://docs.microsoft.com/en-us/windows/security/identity-protection/access-control/security-identifiers
@@ -567,7 +560,7 @@ $REG_QWORD = "Qword"
 $global:valueChanges = @()
 
 $fc = $host.UI.RawUI.ForegroundColor
-$host.UI.RawUI.ForegroundColor = "white"
+$host.UI.RawUI.ForegroundColor = "White"
 
 function Write-Info($text) {
     Write-Host $text -ForegroundColor Yellow
@@ -595,10 +588,6 @@ function CheckError([bool] $result, [string] $message) {
     }
 }
 
-Write-Info "CIS Microsoft Windows Server 2022 Benchmark"
-Write-Info "Script by Evan Greene"
-Write-Info "Original Script written and tested by Vinicius Miguel"
-
 function RegKeyExists([string] $path) {
   # Checks whether the specified registry key exists
   $result = Get-Item $path -ErrorAction SilentlyContinue
@@ -622,19 +611,19 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
   # See: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_commonparameters?view=powershell-7
   # See: https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-7
 
-    $before = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
+  $before = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
   
   if ($?) {
     Write-Before "Was: $($before.$key)"
   }
   else {
-        Write-Before "Was: Not Defined!"
+    Write-Before "Was: Not Defined!"
     $keyExists = RegKeyExists $path
     
     if ($keyExists -eq $false) {
-            Write-Info "Creating registry key '$($path)'."
+      Write-Info "Creating registry key '$($path)'."
       New-Item $path -Force -ErrorAction SilentlyContinue
-            CheckError $? "Creating registry key '$($path)' failed."
+      CheckError $? "Creating registry key '$($path)' failed."
     }
   }
 
@@ -683,7 +672,7 @@ function ResetSec {
 }
 
 function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) {
-    $valueSet = $false       
+    $valueSet = $false
 
     if($null -eq $values) {
         Write-Error "SetSecEdit: At least one value must be provided to set the role:$($role)"
@@ -701,6 +690,10 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
 
     $config = "$($role) = "
     for($r =0; $r -lt $values.Length; $r++){
+        # If null, skip
+        if ($values[$r] -eq $null -or $values[$r].trim() -eq "") {
+            continue
+        }
         # last iteration
         if($r -eq $values.Length -1) {
             if ($values[$r].trim() -ne "") {
@@ -709,6 +702,7 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
         } 
         # not last (include a comma)
         else {
+           $global:val += $values[$r]
             if ($values[$r].trim() -ne "") {
               $config = "$($config)$($values[$r]),"
             }
@@ -739,6 +733,9 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
     if($enforceCreation -eq $true){
         if($valueSet -eq $false) {
             Write-Before "Was: Not Defined"
+
+            # If a configuration option does not exist and comes before the [version] tag, it will not be applied, but if we add it before the [version] tag, it gets applied
+            $lines = $lines | Where-Object {$_ -notin ("[Version]",'signature="$CHICAGO$"',"Revision=1")}
             $lines += $config
 
             $after = $($lines[$lines.Length -1])
@@ -748,6 +745,11 @@ function SetSecEdit([string]$role, [string[]] $values, $area, $enforceCreation) 
                     Write-Red "Value changed."
                     $global:valueChanges += "Not defined => $after"
             }
+
+            # Rewrite the version tag
+            $lines += "[Version]"
+            $lines += 'signature="$CHICAGO$"'
+            $lines += "Revision=1"
         }
     }
 
@@ -767,6 +769,30 @@ function SetSecurityPolicy([string]$role, [string[]] $values, $enforceCreation=$
     SetSecEdit $role $values "SecurityPolicy" $enforceCreation 
 }
 
+function CreateASRExclusions {
+    Write-Info "Creating Attack Surface Reduction Exclusions"
+
+    #Clear current exclusions
+    $currentExclusions = (Get-MpPreference).AttackSurfaceReductionOnlyExclusions
+    foreach ($e in $currentExclusions) {
+        Remove-MpPreference -AttackSurfaceReductionOnlyExclusions $e
+    }
+
+    # Create the ASR exclusions
+    foreach ($e in $AttackSurfaceReductionExclusions) {
+      if (Test-Path $e) {
+        Write-Host "Excluding: " $e
+        Add-MpPreference -AttackSurfaceReductionOnlyExclusions $e
+      }
+    }
+}
+
+function SetWindowsDefenderLogSize {
+    $log = Get-LogProperties "Microsoft-Windows-Windows Defender/Operational"
+    $log.MaxLogSize = $WindowsDefenderLogSize
+    Set-LogProperties -LogDetails $log
+}
+
 function CreateUserAccount([string] $username, [securestring] $password, [bool] $isAdmin=$false) {
     $NewLocalAdminExists = Get-LocalUser -Name $username -ErrorAction SilentlyContinue
     if ($NewLocalAdminExists) {
@@ -780,6 +806,8 @@ function CreateUserAccount([string] $username, [securestring] $password, [bool] 
             Add-LocalGroupMember -Group "Administrators" -Member $username
             Write-Info "Administrator account $($username) is now member of the local Administrators group."
         }
+
+        $global:rebootRequired = $true
     }
 }
 
@@ -901,7 +929,7 @@ function NoOneTrustCallerACM {
 function AccessComputerFromNetwork {
     #2.2.3 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Access this computer from the network
     Write-Info "2.2.3 (L1) Ensure 'Access this computer from the network' is set to 'Administrators, Authenticated Users"
-    SetUserRight "SeNetworkLogonRight" @($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
+    SetUserRight "SeNetworkLogonRight" ($SID_ADMINISTRATORS, $SID_AUTHENTICATED_USERS)
 }
 
 function NoOneActAsPartOfOperatingSystem {
@@ -992,8 +1020,7 @@ function DebugPrograms {
 
 function DenyNetworkAccess {
     #2.2.21 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny access to this computer from the network
-    Write-Info "2.2.21 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests, Local account and member of Administrators group'"
-    #SetUserRight "SeDenyNetworkLogonRight" ($SID_LOCAL_ACCOUNT, $($AdminNewAccountName),$($SID_GUESTS))
+    Write-Info "2.2.21 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests, Local account, and member of Administrators group'"
 
     $addlDenyUsers = ""
     if ($AdditionalUsersToDenyNetworkAccess.Count -gt 0) {
@@ -1001,10 +1028,10 @@ function DenyNetworkAccess {
     }
 
     if ($AllowRDPFromLocalAccount -eq $true) {
-        SetUserRight "SeDenyNetworkLogonRight" ($($AdminNewAccountName),$addlDenyUsers,$($SID_GUESTS))
+        SetUserRight "SeDenyNetworkLogonRight" ($($global:AdminNewAccountName),$addlDenyUsers,$($SID_GUESTS))
     }
     else {
-        SetUserRight "SeDenyNetworkLogonRight" ($($AdminNewAccountName),$addlDenyUsers,$SID_LOCAL_ACCOUNT,$($SID_GUESTS))
+        SetUserRight "SeDenyNetworkLogonRight" ($($global:AdminNewAccountName),$addlDenyUsers,$SID_LOCAL_ACCOUNT,$($SID_GUESTS))
     }
 }
 
@@ -1043,10 +1070,10 @@ function DenyRemoteDesktopServiceLogon {
 
 
     if ($AllowRDPFromLocalAccount -eq $true) {
-      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($GuestNewAccountName,$addlDenyUsers)
+      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($SID_GUESTS,$addlDenyUsers)
     }
     else {
-      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($GuestNewAccountName,$addlDenyUsers,$SID_LOCAL_ACCOUNT)
+      SetUserRight "SeDenyRemoteInteractiveLogonRight" ($SID_GUESTS,$addlDenyUsers,$SID_LOCAL_ACCOUNT)
     }
 }
 
@@ -1179,28 +1206,52 @@ function LimitBlankPasswordConsole {
 
 function RenameAdministratorAccount {
     #2.3.1.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename administrator account
-    if ($RenamedAdmin) {
+    $CurrentAdminUser = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-500'").Name
+    $CurrentAdminPrefix = $CurrentAdminUser.substring(0,($CurrentAdminUser.Length-4)) # Remove the random seed from the end
+
+    # If the current admin user prefix matches the configured admin user prefix, we should skip this section.
+    if ($CurrentAdminUser.Length -eq ($AdminAccountPrefix.Length + 4) -and 
+        $CurrentAdminPrefix -eq $AdminAccountPrefix
+    ) {
         Write-Red "Skipping 2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
-        Write-Red "- Administrator account already renamed: $($RenamedAdmin.Name)."
+        Write-Red "- Administrator account already renamed: $($CurrentAdminUser)."
+
+        return
     }
-    else {
-        Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
-        SetSecurityPolicy "NewAdministratorName" (,"`"$($AdminNewAccountName)`"")
-        Set-LocalUser -Name $AdminNewAccountName -Description ""
-    }
+
+    # Prefix doesn't match, continue renaming...
+    $seed = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system. 4-digit random number.
+    $global:AdminNewAccountName = "$($AdminAccountPrefix)$($seed)"
+    
+    Write-Info "2.3.1.5 (L1) Configure 'Accounts: Rename administrator account'"
+    Write-Info "- Renamed to $($global:AdminNewAccountName)"
+    SetSecurityPolicy "NewAdministratorName" (,"`"$($global:AdminNewAccountName)`"")
+    Set-LocalUser -Name $global:AdminNewAccountName -Description ""
 }
 
 function RenameGuestAccount {
     #2.3.1.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Accounts: Rename guest account
-    if ($RenamedGuest) {
+    $CurrentGuestUser = (Get-CimInstance -ClassName Win32_UserAccount -Filter "LocalAccount = TRUE and SID like 'S-1-5-%-501'").Name
+    $CurrentGuestPrefix = $CurrentGuestUser.substring(0,($CurrentGuestUser.Length-4)) # Remove the random seed from the end
+
+    # If the current guest user prefix matches the configured guest user prefix, we should skip this section.
+    if ($CurrentGuestUser.Length -eq ($CurrentGuestPrefix.Length + 4) -and 
+        $CurrentGuestPrefix -eq $GuestAccountPrefix
+    ) {
         Write-Red "Skipping 2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
-        Write-Red "- Guest account already renamed: $($RenamedGuest.Name)."
+        Write-Red "- Guest account already renamed: $($CurrentGuestUser)"
+
+        return
     }
-    else {
-        Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
-        SetSecurityPolicy "NewGuestName" (,"`"$($GuestNewAccountName)`"")
-        Set-LocalUser -Name $GuestNewAccountName -Description ""
-    }
+
+    # Prefix doesn't match, continue renaming...
+    $seed = Get-Random -Minimum 1000 -Maximum 9999   #Randomize the new admin and guest accounts on each system. 4-digit random number.
+    $GuestNewAccountName = "$($GuestAccountPrefix)$($seed)"
+    
+    Write-Info "2.3.1.6 (L1) Configure 'Accounts: Rename guest account'"
+    Write-Info "- Renamed to $($GuestNewAccountName)"
+    SetSecurityPolicy "NewGuestName" (,"`"$($GuestNewAccountName)`"")
+    Set-LocalUser -Name $GuestNewAccountName -Description ""
 }
 
 function AuditForceSubCategoryPolicy {
@@ -1584,14 +1635,13 @@ function EnableSecureUIAPaths {
 }
 
 function EnableLUA {
-    #2.3.17.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\User Account Control: Run all administrators in Admin Approval Mode
-    
+    #2.3.17.6 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\User Account Control: Run all administrators in Admin Approval Mode    
     if ($DontSetEnableLUAForVeeamBackup -eq $false) {
         Write-Info "2.3.17.6 (L1) Ensure 'User Account Control: Run all administrators in Admin Approval Mode' is set to 'Enabled'"
         SetSecurityPolicy "MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA" (, "4,1")
     }
     else {
-        Write-Red "Opposed 2.3.17.6 (L1) Ensure 'User Account Control: Run all administrators in Admin Approval Mode' is set to 'Enabled'"
+        Write-Red "Opposing 2.3.17.6 (L1) Ensure 'User Account Control: Run all administrators in Admin Approval Mode' is set to 'Enabled'"
         Write-Red "- You enabled $DontSetEnableLUAForVeeamBackup. This setting has been opposed and set to 0 against CIS recommendations, but Veeam Backup will be able to perform backup operations."
         SetSecurityPolicy "MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\EnableLUA" (, "4,0")
     }
@@ -1964,7 +2014,7 @@ function LocalAccountTokenFilterPolicy {
         SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" "LocalAccountTokenFilterPolicy" "0" $REG_DWORD
     }
     else {
-        Write-Info "Opposing 18.3.1 (L1) Ensure 'Apply UAC restrictions to local accounts on network logons' is set to 'Enabled'"
+        Write-Red "Opposing 18.3.1 (L1) Ensure 'Apply UAC restrictions to local accounts on network logons' is set to 'Enabled'"
         Write-Red '- You enabled $DontSetTokenFilterPolicyForPSExec. This CIS configuration has been skipped so that PSExec can run over the network using an admin account.'
         SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" "LocalAccountTokenFilterPolicy" "1" $REG_DWORD
     }
@@ -3205,21 +3255,11 @@ function WindowsUpdateQuality {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" "DeferQualityUpdatesPeriodInDays" "0" $REG_DWORD
 }
 
-function ValidatePasswords([SecureString] $pass1, [SecureString] $pass2) {
-    $plaintext1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($pass1))
-    $plaintext2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($pass2))
-
-    if ($plaintext1 -ne $plaintext2) {
-        return $false
-    }
-
-    if ($plaintext1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!_%*?&])[A-Za-z\d@$#^!_%*?&]{15,}$") {
-        return $false
-    }
-
-    return $frue
+function ValidatePasswords([string] $pass1, [string] $pass2) {
+    if($pass1 -ne $pass2) { return $False }
+    if($pass1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!%*?&])[A-Za-z\d@$#^!%*?&]{15,}$") { return $False }
+    return $True;
 }
-
 if ([Environment]::Is64BitProcess -ne [Environment]::Is64BitOperatingSystem)
 {
     Write-Error "You must execute this script on a x64 shell"
@@ -3227,98 +3267,72 @@ if ([Environment]::Is64BitProcess -ne [Environment]::Is64BitOperatingSystem)
     return 1;
 }
 
-if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator")) {
-    $temp_pass1 = ""
-    $temp_pass2 = ""
-    $invalid_pass = $true
+if(([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]"Administrator") -eq $false) {
+    Write-Error "You must execute this script with administrator privileges!"
+    Write-Error "Aborted."
+    return 1;
+}
 
-    if($NewLocalAdminUsername) {
-        if(!($NewLocalAdminPassword)) {
-            Write-Red "NewLocalAdminUsername set but NewLocalAdminPasswd not set."
-            Write-Red "Please use -NewLocalAdminPassword parameter to set the password."
-            Write-Red "Aborted."
-            return
-        } else {
-            if((ValidatePasswords $NewLocalAdminPassword $NewLocalAdminPassword) -eq $False) {
-                Write-Red "NewLocalAdminPassword does not fullfill the minimum security requirements."
-                Write-Info "Your passwords must contain at least 15 characters, capital letters, numbers and symbols."
-                return 1;
-            } else {
-                $NewLocalAdminPassword = ConvertTo-SecureString $NewLocalAdminPassword -AsPlainText -Force 
-            }
+Write-Info "CIS Microsoft Windows Server 2022 Benchmark"
+Write-Info "Script by Evan Greene"
+Write-Info "Original Script written and tested by Vinicius Miguel"
+
+# Enable Windows Defender settings on Windows Server
+Set-MpPreference -AllowNetworkProtectionOnWinServer 1
+Set-MpPreference -AllowNetworkProtectionDownLevel 1
+Set-MpPreference -AllowDatagramProcessingOnWinServer 1
+
+$temp_pass1 = ""
+$temp_pass2 = ""
+$invalid_pass = $true
+
+# Get input password if the admin account does not already exist
+$NewLocalAdminExists = Get-LocalUser -Name $NewLocalAdmin -ErrorAction SilentlyContinue
+if ($NewLocalAdminExists.Count -eq 0) {
+    do {
+        Write-Info "I will create a new Administrator account, you need to specify the new account password."
+        Write-Info "Your password must contain at least 15 characters, capital letters, numbers and symbols"
+        
+        Write-Info "Please enter the new password:"
+        $temp_pass1 = Read-Host
+        Write-Info "Please repeat the new password:"
+        $temp_pass2 = Read-Host 
+        
+        $invalid_pass = ValidatePasswords $temp_pass1 $temp_pass2 
+        if($invalid_pass -eq $false) {
+            Write-Error "Your passwords do not match or do not follow the minimum complexity requirements, try again."
+        } 
+        else {
+            $NewLocalAdminPassword = ConvertTo-SecureString $temp_pass1 -AsPlainText -Force 
         }
-    } else {
-        do {
-            Write-Info "I will create a new Administrator account, you need to specify the new account password."
-            Write-Info "Your password must contain at least 15 characters, capital letters, numbers and symbols"
-            Write-Info "Please enter the new password:"
-            $temp_pass1 = Read-Host -AsSecureString
-            Write-Info "Please repeat the new password:"
-            $temp_pass2 = Read-Host -AsSecureString
-            $invalid_pass = ValidatePasswords $temp_pass1 $temp_pass2 
-            if($invalid_pass -eq $false) {
-                Write-Red "Your passwords do not match or do not follow the minimum complexity requirements, try again."
-            } else {
-                $NewLocalAdminPassword = $temp_pass1
-            }
-        } while($invalid_pass -eq $false)
-    }
+    } while($invalid_pass -eq $false)
+}
+
+$location = Get-Location
     
-    if($LegalNoticeMessageFile -ne "") {
-        if(Test-Path($LegalNoticeMessageFile) -eq $False) {
-            Write-Error "The script cannot continue, The LegalNoticeMessageFile was provided but could not found"
-            return 1;
-        }
-        $legalNoticeFilePath = Resolve-Path $LegalNoticeMessageFile
-
-        $legalNoticeFileContent = Get-Content $legalNoticeFilePath -ErrorAction Stop | ForEa ch-Object { $_.Trim() } | Where-Object { $_ -ne "" }
-
-        if($legalNoticeFileContent.Length -ne 2) {
-            Write-Error "The script cannot continue, The LegalNoticeMessageFile content should contain 2 Lines, being the first one the Legal Notice Title and the second one the Legal Notice Message"
-            return 1;
-        }
-        $LogonLegalNoticeMessageTitle = $legalNoticeFileContent[0]
-        $LogonLegalNoticeMessage = $legalNoticeFileContent[1]
-    }
-
-    if($ExecutionListFile -ne "") {
-        if(Test-Path($ExecutionListFile) -eq $False) {
-            Write-Error "A execution list file was provided as parameter but could not be found! Aborting."
-            return 1;
-        }
-        $ExecutionList = Get-Content $ExecutionListFile -ErrorAction Stop | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" -and $_[0] -ne "#" }
-    }
-
-    $location = Get-Location
+secedit /export /cfg "$location\secedit_original.cfg"  | out-null
     
-    secedit /export /cfg "$location\secedit_original.cfg"  | out-null
+Start-Transcript -Path "$location\PolicyResults.txt"
+$ExecutionList | ForEach-Object { ( Invoke-Expression $_) } | Out-File $location\CommandsReport.txt
+Stop-Transcript
     
-    Start-Transcript -Path "$location\PolicyResults.txt"
-    $ExecutionList | ForEach-Object { ( Invoke-Expression $_) } | Out-File $location\CommandsReport.txt
+"The following policies were defined in the ExecutionList: " | Out-File $location\PoliciesApplied.txt
+$ExecutionList | Out-File $location\PoliciesApplied.txt -Append
 
-    Stop-Transcript
+Write-Host ""
+
+Start-Transcript -Path "$location\PolicyChangesMade.txt"
+Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+Write-After "Changes Made"
+Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+Write-Red ($global:valueChanges -join "`n")
+Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+Stop-Transcript 
+
+secedit /export /cfg $location\secedit_final.cfg | out-null
+
+Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+Write-After "Completed. Logs written to: $location"
     
-    "The following policies were defined in the ExecutionList: " | Out-File $location\PoliciesApplied.txt
-    $ExecutionList | Out-File $location\PoliciesApplied.txt -Append
-
-    Write-Host ""
-    Start-Transcript -Path "$location\PolicyChangesMade.txt"
-    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    Write-After "Changes Made"
-    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    Write-Red ($global:valueChanges -join "`n")
-    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    Stop-Transcript 
-
-    secedit /export /cfg $location\secedit_final.cfg | out-null
-
-    Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-    Write-After "Completed. Logs written to: $location"
-} 
-    else {
-        Write-Error "You must execute this script with administrator privileges!"
-        Write-Error "Aborted."
-        return 1;
-    }
 
 $host.UI.RawUI.ForegroundColor = $fc

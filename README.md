@@ -88,8 +88,9 @@ The script produces the following logs. The logs are written to the location the
 - PolicyChangesMade.txt - This records all of the changes that the script applied. It only records what changed and not what the script was configured to change. IE: If you already had a CIS setting in place, it will not record that change - only the CIS settings this script altered.
 - PolicyResults.txt - This records the entire results of each CIS setting with each having a "Before" and "After" so that you can see how the script affected your configuration. If a setting was changed "Value changed" will be reported in the output so that you can easily search through the log to locate any settings that changed. The same changes are also reported in PolicyChangesMade.txt.
 
-# Verification Script Applies All CIS Configurations
-2023.03.11 Configurations have been validated. The results of any failures are below with notes. All other settings passed.
+# Vaidation
+2023.03.11 
+The following are the results after a single run of the script in its default, untouched configuration. The results of any failures are below with notes. All other settings passed.
 
 #### Audits Failed
 | CIS Section | CIS Description | Notes |

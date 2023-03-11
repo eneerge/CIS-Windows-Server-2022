@@ -89,7 +89,31 @@ The script produces the following logs. The logs are written to the location the
 - PolicyResults.txt - This records the entire results of each CIS setting with each having a "Before" and "After" so that you can see how the script affected your configuration. If a setting was changed "Value changed" will be reported in the output so that you can easily search through the log to locate any settings that changed. The same changes are also reported in PolicyChangesMade.txt.
 
 # Verification Script Applies All CIS Configurations
-I am currently validating the script using Microsoft's Vulnerability Management Baseline Assesment tool in addition to Tenable's CIS configuration audit scan. I will post results soon.
+2023.03.11 Configurations have been validated. The results of any failures are below with notes. All other settings passed.
+
+#### Audits Failed
+| CIS Section | CIS Description | Notes |
+| :---------- | :-------------- | :---- |
+| 18.2.1 | Ensure LAPS AdmPwd GPO Extension / CSE is installed (MS only) | As noted, LAPs can not be implemented by the script automatically, since it requires additional the admin to do additional configuration. There are alternative solutions to LAPs, such as https://github.com/eneerge/NAble-LAPS-LocalAdmin-Password-Rotation |
+| 18.2.2 | Ensure 'Do not allow password expiration time longer than required by policy' is set to 'Enabled' (MS only) - Enabled | LAPS Related |
+| 18.2.3 | Ensure 'Enable Local Admin Password Management' is set to 'Enabled' (MS only) - Enabled | LAPS Related |
+| 18.2.4 | Ensure 'Password Settings: Password Complexity' is set to 'Enabled: Large letters + small letters + numbers + special characters' (MS only) - Enabled: Large letters + small letters + numbers + special characters | LAPS Related |
+| 18.2.5 | Ensure 'Password Settings: Password Length' is set to 'Enabled: 15 or more' (MS only) - Enabled: 15 or more | LAPS Related |
+| 18.2.6 | Ensure 'Password Settings: Password Age (Days)' is set to 'Enabled: 30 or fewer' (MS only) - Enabled: 30 or fewer | LAPS Related |
+| 18.9.108.4.1 | Ensure 'Manage preview builds' is set to 'Disabled' - ManagePreviewBuilds | Investigating |
+| 18.9.108.4.1 | Ensure 'Manage preview builds' is set to 'Disabled' - ManagePreviewBuildsPolicyValue | Investigating |
+| 18.9.47.4.2 | Ensure 'Join Microsoft MAPS' is set to 'Disabled' | Opposed: By default, the compatibility assurance option $AllowDefenderMAPS is set to true. The script joins MAPS so that additional security features can be enabled. |
+| 18.9.65.3.3.3 | Ensure 'Do not allow drive redirection' is set to 'Enabled' | Opposed: By default, the compatibility assurance option $AllowRDPClipboard is set to true. This allows copying and pasting in an RDP session. |
+| 2.2.21 | Ensure 'Deny access to this computer from the network' to include 'Guests, Local account and member of Administrators group' (MS only) - Guests, Local account and member of Administrators group | Opposed: The default configuration does not include "Local account and member of Administrators group" by default. This script was initially written for a non-domain joined computer. If you include this configuration, access to the server would be impossible over the network. |
+| 2.2.26 | Ensure 'Deny log on through Remote Desktop Services' is set to 'Guests, Local account' (MS only) - Guests,Local account | Opposed: By default, the compatibility assurance option $AllowRDPFromLocalAccount is set to true. This prevents this setting from being applied. In a non-domain environment, if this setting was applied, you would not be able to access the server. |
+| 2.3.10.4 | Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled' | Opposed: By default, the compatibility assurance option $AllowStoringPasswordsForTasks is set to true. This allows saving passwords in a scheduled task. In a non-domain environment, access to the server's saved passwords should be restricted to a local admin account. |
+| 2.3.7.4 | Configure 'Interactive logon: Message text for users attempting to log on' | There is no interactive logon text set by default by the script. Set one to pass this audit. |
+| 2.3.7.5 | Configure 'Interactive logon: Message title for users attempting to log on' | There is no interactive logon title set by default by the script. Set one to pass this audit. |
+| 2.3.9.5 | Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher (MS only) - Accept if provided by client or higher | Opposed: By default, the compatibility assurance option $AllowAccessToSMBWithDifferentSPN is set to true. In a non-domain environment accessing via an alternative SPN is a likely scenario.
+| 9.3.5 | Ensure 'Windows Firewall: Public: Settings: Apply local firewall rules' is set to 'No' | Opposed: There is no other source of firewall rules on a non-domain joined server.
+| 9.3.6 | Ensure 'Windows Firewall: Public: Settings: Apply local connection security rules' is set to 'No' | Opposed: There is no other source of firewall rules on a non-domain joined server.
+
+
 
 # Notes
 Windows Server on-premise machines can not currently be managed by Intune. If you have removed all Active Directory components from your environment as I have, one solution to ensure servers adhere to a baseline is to run a script to apply all of the configurations.

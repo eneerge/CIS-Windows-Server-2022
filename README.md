@@ -82,7 +82,7 @@ The script can be run on a recurring basis. This allows you to enforce the confi
 On recurring runs, the script skips creating an admin user and does not prompt for a password. This allows it to run without any interaction. The script can be set up as a scheduled task or you can configure your RMM software to kick off the process at an interval of your choosing.
 
 ## Logging
-The script produces the following logs. The logs are written to the location the script is run from. By default this will be C:\users\<username>:
+The script produces the following logs. The logs are written to the location the script is run from.
 - CommandsReport.txt - This records the output of running Windows commands to import the local security policy
 - PoliciesApplied.txt - This records the policies that were specified in the $ExecutionList
 - PolicyChangesMade.txt - This records all of the changes that the script applied. It only records what changed and not what the script was configured to change. IE: If you already had a CIS setting in place, it will not record that change - only the CIS settings this script altered.

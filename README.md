@@ -94,16 +94,6 @@ The script produces the following logs. The logs are written to the location the
 #### Audits Failed
 | CIS Section | CIS Description | Notes |
 | :---------- | :-------------- | :---- |
-| 18.2.1 | Ensure LAPS AdmPwd GPO Extension / CSE is installed (MS only) | As noted, LAPs can not be implemented by the script automatically, since it requires additional the admin to do additional configuration. There are alternative solutions to LAPs, such as https://github.com/eneerge/NAble-LAPS-LocalAdmin-Password-Rotation |
-| 18.2.2 | Ensure 'Do not allow password expiration time longer than required by policy' is set to 'Enabled' (MS only) - Enabled | LAPS Related |
-| 18.2.3 | Ensure 'Enable Local Admin Password Management' is set to 'Enabled' (MS only) - Enabled | LAPS Related |
-| 18.2.4 | Ensure 'Password Settings: Password Complexity' is set to 'Enabled: Large letters + small letters + numbers + special characters' (MS only) - Enabled: Large letters + small letters + numbers + special characters | LAPS Related |
-| 18.2.5 | Ensure 'Password Settings: Password Length' is set to 'Enabled: 15 or more' (MS only) - Enabled: 15 or more | LAPS Related |
-| 18.2.6 | Ensure 'Password Settings: Password Age (Days)' is set to 'Enabled: 30 or fewer' (MS only) - Enabled: 30 or fewer | LAPS Related |
-| 18.9.108.4.1 | Ensure 'Manage preview builds' is set to 'Disabled' - ManagePreviewBuilds | False positive. The setting is applied as detailed in the CIS benchmark. Additionally, the default setting in Windows has this disabled by default. |
-| 18.9.108.4.1 | Ensure 'Manage preview builds' is set to 'Disabled' - ManagePreviewBuildsPolicyValue | False positive. The setting is applied as detailed in the CIS benchmark. Additionally, the default setting in Windows has this disabled by default. |
-| 18.9.47.4.2 | Ensure 'Join Microsoft MAPS' is set to 'Disabled' | Opposed: By default, the compatibility assurance option $AllowDefenderMAPS is set to true. The script joins MAPS so that additional security features can be enabled. |
-| 18.9.65.3.3.3 | Ensure 'Do not allow drive redirection' is set to 'Enabled' | Opposed: By default, the compatibility assurance option $AllowRDPClipboard is set to true. This allows copying and pasting in an RDP session. |
 | 2.2.21 | Ensure 'Deny access to this computer from the network' to include 'Guests, Local account and member of Administrators group' (MS only) - Guests, Local account and member of Administrators group | Opposed: The default configuration does not include "Local account and member of Administrators group" by default. This script was initially written for a non-domain joined computer. If you include this configuration, access to the server would be impossible over the network. |
 | 2.2.26 | Ensure 'Deny log on through Remote Desktop Services' is set to 'Guests, Local account' (MS only) - Guests,Local account | Opposed: By default, the compatibility assurance option $AllowRDPFromLocalAccount is set to true. This prevents this setting from being applied. In a non-domain environment, if this setting was applied, you would not be able to access the server. |
 | 2.3.10.4 | Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled' | Opposed: By default, the compatibility assurance option $AllowStoringPasswordsForTasks is set to true. This allows saving passwords in a scheduled task. In a non-domain environment, access to the server's saved passwords should be restricted to a local admin account. |
@@ -112,7 +102,16 @@ The script produces the following logs. The logs are written to the location the
 | 2.3.9.5 | Ensure 'Microsoft network server: Server SPN target name validation level' is set to 'Accept if provided by client' or higher (MS only) - Accept if provided by client or higher | Opposed: By default, the compatibility assurance option $AllowAccessToSMBWithDifferentSPN is set to true. In a non-domain environment accessing via an alternative SPN is a likely scenario.
 | 9.3.5 | Ensure 'Windows Firewall: Public: Settings: Apply local firewall rules' is set to 'No' | Opposed: There is no other source of firewall rules on a non-domain joined server.
 | 9.3.6 | Ensure 'Windows Firewall: Public: Settings: Apply local connection security rules' is set to 'No' | Opposed: There is no other source of firewall rules on a non-domain joined server.
-
+| 18.2.1 | Ensure LAPS AdmPwd GPO Extension / CSE is installed (MS only) | As noted, LAPs can not be implemented by the script automatically, since it requires additional the admin to do additional configuration. There are alternative solutions to LAPs, such as https://github.com/eneerge/NAble-LAPS-LocalAdmin-Password-Rotation |
+| 18.2.2 | Ensure 'Do not allow password expiration time longer than required by policy' is set to 'Enabled' (MS only) - Enabled | LAPS Related |
+| 18.2.3 | Ensure 'Enable Local Admin Password Management' is set to 'Enabled' (MS only) - Enabled | LAPS Related |
+| 18.2.4 | Ensure 'Password Settings: Password Complexity' is set to 'Enabled: Large letters + small letters + numbers + special characters' (MS only) - Enabled: Large letters + small letters + numbers + special characters | LAPS Related |
+| 18.2.5 | Ensure 'Password Settings: Password Length' is set to 'Enabled: 15 or more' (MS only) - Enabled: 15 or more | LAPS Related |
+| 18.2.6 | Ensure 'Password Settings: Password Age (Days)' is set to 'Enabled: 30 or fewer' (MS only) - Enabled: 30 or fewer | LAPS Related |
+| 18.9.47.4.2 | Ensure 'Join Microsoft MAPS' is set to 'Disabled' | Opposed: By default, the compatibility assurance option $AllowDefenderMAPS is set to true. The script joins MAPS so that additional security features can be enabled. |
+| 18.9.65.3.3.3 | Ensure 'Do not allow drive redirection' is set to 'Enabled' | Opposed: By default, the compatibility assurance option $AllowRDPClipboard is set to true. This allows copying and pasting in an RDP session. |
+| 18.9.108.4.1 | Ensure 'Manage preview builds' is set to 'Disabled' - ManagePreviewBuilds | False positive. The setting is applied as detailed in the CIS benchmark. Additionally, the default setting in Windows has this disabled by default. |
+| 18.9.108.4.1 | Ensure 'Manage preview builds' is set to 'Disabled' - ManagePreviewBuildsPolicyValue | False positive. The setting is applied as detailed in the CIS benchmark. Additionally, the default setting in Windows has this disabled by default. |
 
 
 # Notes

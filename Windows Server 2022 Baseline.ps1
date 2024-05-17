@@ -25,7 +25,7 @@ $AllowDefenderMAPS = $true;                   # CIS 18.9.47.4.2 - Set to true to
 $AllowStoringPasswordsForTasks = $true        # CIS 2.3.10.4 - Set to true to oppose CIS recommendation and allow storing of passwords. CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible. (DisableDomainCreds)
 $AllowAccessToSMBWithDifferentSPN = $true     # CIS 2.3.9.5 - Set to true to oppose CIS recommendation and allow SMB over unknown SPN. CIS recommends setting SPN validation to "Accept if provided by client." This can cause issues if you attempt to access a share using a different DNS name than the server currently recognizes. IE: If you have a non-domain joined computer and you access it using a DNS name that the server doesn't realize points to it, then the server will reject the connection. EG: Say you connect to "myserver.company.com", but the server's local name is just "myserver" and the server has no knowledge that it is also called "myserver.company.com" then the connection will be denied. (LanManServerSmbServerNameHardeningLevel)
 $DontSetEnableLUAForVeeamBackup = $false       # CIS 2.3.17.6 - Set to true to oppose CIS recommendation and don't run all admins in Admin Approval Mode. CIS recommends setting this registry value to 1 so that all Admin users including the built in account must run in Admin Approval Mode (UAC popup always when running admin). However, this breaks Veeam Backup. See: https://www.veeam.com/kb4185
-$DontSetTokenFilterPolicyForPSExec = $false    # CIS 18.3.1 - Set to true to oppose CIS recommendation and don't set require UAC for admins logging in over a network. Highly recommended to leave this $false unless you are legitimately using PSExec for any reason on the server. In addition, EnableLUA should also be disabled. See https://www.brandonmartinez.com/2013/04/24/resolve-access-is-denied-using-psexec-with-a-local-admin-account/
+$DontSetTokenFilterPolicyForPSExec = $true   # CIS 18.3.1 - Set to true to oppose CIS recommendation and don't set require UAC for admins logging in over a network. Highly recommended to leave this $false unless you are legitimately using PSExec for any reason on the server. In addition, EnableLUA should also be disabled. See https://www.brandonmartinez.com/2013/04/24/resolve-access-is-denied-using-psexec-with-a-local-admin-account/
 
 #########################################################
 # Attack Surface Reduction Exclusions (Recommended)
@@ -65,7 +65,7 @@ $ExecutionList = @(
     "SetWindowsDefenderLogSize"                                         # Sets the defender log size as configured in the top of this script
     #KEEP THESE IN THE BEGINING
     "CreateNewLocalAdminAccount",                                       #Mandatory otherwise the system access is lost
-    "RenameAdministratorAccount",                                       #2.3.1.5 
+    # "RenameAdministratorAccount",                                       #2.3.1.5 
     "RenameGuestAccount",                                               #2.3.1.6
     ###########################
     #"ResetSec",                                                        # Uncomment to reset the "Local Security Policy" (this doesn't touch the registry settings that are not in the Local Security Policy)

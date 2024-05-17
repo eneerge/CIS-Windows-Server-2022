@@ -1,0 +1,293 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20240517122037
+Username: AD\easkjmartin
+RunAs User: AD\easkjmartin
+Configuration Name: 
+Machine: HEAT-KJM-CIS1 (Microsoft Windows NT 10.0.20348.0)
+Host Application: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+Process ID: 4972
+PSVersion: 5.1.20348.2400
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.20348.2400
+BuildVersion: 10.0.20348.2400
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\temp\PolicyChangesMade.txt
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Changes Made
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+NewGuestName = "Guest" => NewGuestName = "DisabledUser4365"
+HKLM:\System\CurrentControlSet\Control\SAM =>  to 1
+SeNetworkLogonRight = *S-1-1-0,*S-1-5-32-544,*S-1-5-32-545,*S-1-5-32-551 => SeNetworkLogonRight = *S-1-5-32-544,*S-1-5-11
+SeInteractiveLogonRight = *S-1-5-32-544,*S-1-5-32-545,*S-1-5-32-551 => SeInteractiveLogonRight = *S-1-5-32-544
+SeBackupPrivilege = *S-1-5-32-544,*S-1-5-32-551 => SeBackupPrivilege = *S-1-5-32-544
+SeDenyNetworkLogonRight = *S-1-5-21-1317685450-932939914-1801392649-512,*S-1-5-21-1317685450-932939914-1801392649-519 => SeDenyNetworkLogonRight = *S-1-5-32-546
+SeDenyBatchLogonRight = *S-1-5-21-1317685450-932939914-1801392649-512,*S-1-5-21-1317685450-932939914-1801392649-519 => SeDenyBatchLogonRight = *S-1-5-32-546
+SeDenyServiceLogonRight = *S-1-5-21-1317685450-932939914-1801392649-512,*S-1-5-21-1317685450-932939914-1801392649-519 => SeDenyServiceLogonRight = *S-1-5-32-546
+SeDenyInteractiveLogonRight = *S-1-5-21-1317685450-932939914-1801392649-512,*S-1-5-21-1317685450-932939914-1801392649-519 => SeDenyInteractiveLogonRight = *S-1-5-32-546
+SeDenyRemoteInteractiveLogonRight = *S-1-5-21-1317685450-932939914-1801392649-512,*S-1-5-21-1317685450-932939914-1801392649-519 => SeDenyRemoteInteractiveLogonRight = *S-1-5-32-546
+SeDelegateSessionUserImpersonatePrivilege = *S-1-5-32-544 => SeDelegateSessionUserImpersonatePrivilege = ""
+SeRestorePrivilege = *S-1-5-32-544,*S-1-5-32-551 => SeRestorePrivilege = *S-1-5-32-544
+SeShutdownPrivilege = *S-1-5-32-544,*S-1-5-32-551 => SeShutdownPrivilege = *S-1-5-32-544
+EnableAdminAccount = 1 => EnableAdminAccount = 0
+Not defined => MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\NoConnectedUser = 4,3
+Not defined => MACHINE\System\CurrentControlSet\Control\Lsa\SCENoApplyLegacyAuditPolicy = 4,1
+Not defined => MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\AllocateDASD = 1,"0"
+Not defined => MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\InactivityTimeoutSecs = 4,900
+MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount=1,"0" => MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\CachedLogonsCount = 1,"4"
+MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ForceUnlockLogon=4,0 => MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ForceUnlockLogon = 4,1
+MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScRemoveOption=1,"0" => MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon\ScRemoveOption = 1,"1"
+MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\RequireSecuritySignature=4,0 => MACHINE\System\CurrentControlSet\Services\LanmanWorkstation\Parameters\RequireSecuritySignature = 4,1
+MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature=4,0 => MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\RequireSecuritySignature = 4,1
+HKLM:\SYSTEM\CurrentControlSet\Services\LanManServer\Parameters => 0 to 1
+Not defined => MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\SmbServerNameHardeningLevel = 4,0
+HKLM:\System\CurrentControlSet\Control\Lsa =>  to 1
+MACHINE\System\CurrentControlSet\Control\Lsa\RestrictRemoteSAM=1,"O:BAG:BAD:(A;;RC;;;BA)(A;;RC;;;S-1-5-21-1317685450-932939914-1801392649-1121310)" => MACHINE\System\CurrentControlSet\Control\Lsa\RestrictRemoteSAM = 1,"O:BAG:BAD:(A;;RC;;;BA)"
+Not defined => MACHINE\System\CurrentControlSet\Services\LanManServer\Parameters\NullSessionShares = 7
+Not defined => MACHINE\System\CurrentControlSet\Control\Lsa\UseMachineId = 4,1
+Not defined => MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\allownullsessionfallback = 4,0
+Not defined => MACHINE\System\CurrentControlSet\Control\Lsa\pku2u\AllowOnlineID = 4,0
+Not defined => MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\Kerberos\Parameters\SupportedEncryptionTypes = 4,2147483640
+Not defined => MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\FilterAdministratorToken = 4,1
+MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin=4,5 => MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorAdmin = 4,2
+MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorUser=4,3 => MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\System\ConsentPromptBehaviorUser = 4,0
+HKLM:\SYSTEM\CurrentControlSet\Services\Spooler => 2 to 4
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging => %systemroot%\system32\logfiles\firewall\pfirewall.log to %SystemRoot%\System32\logfiles\firewall\domainfw.log
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging =>  to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\DomainProfile\Logging =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile\Logging =>  to %SystemRoot%\System32\logfiles\firewall\privatefw.log
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile\Logging =>  to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile\Logging =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PrivateProfile\Logging =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile\Logging =>  to %SystemRoot%\System32\logfiles\firewall\publicfw.log
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile\Logging =>  to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile\Logging =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile\Logging =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Personalization =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization =>  to 0
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer =>  to 0
+HKLM:\SYSTEM\CurrentControlSet\Services\mrxsmb10 =>  to 4
+HKLM:\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers\PointAndPrint =>  to 1
+HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters =>  to 2
+HKLM:\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest =>  to 0
+HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon =>  to 0
+HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters =>  to 2
+HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters =>  to 2
+HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters => 1 to 0
+HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters =>  to 300000
+HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters =>  to 1
+HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters =>  to 0
+HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon =>  to 5
+HKLM:\SYSTEM\CurrentControlSet\Services\TCPIP6\Parameters =>  to 3
+HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters =>  to 3
+HKLM:\SYSTEM\CurrentControlSet\Services\Eventlog\Security =>  to 90
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient =>  to 3
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\DNSClient =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LanmanWorkstation =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLTD =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Peernet =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Network Connections =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Network Connections =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Network Connections =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths =>  to RequireMutualAuthentication=1, RequireIntegrity=1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths =>  to RequireMutualAuthentication=1, RequireIntegrity=1
+HKLM:\SYSTEM\CurrentControlSet\Services\TCPIP6\Parameters =>  to 255
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\Registrars =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WCN\UI =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy =>  to 3
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WcmSvc\GroupPolicy =>  to 1
+HKLM:\Software\Policies\Microsoft\Windows NT\Printers =>  to 2
+HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint =>  to 0
+HKLM:\Software\Policies\Microsoft\Windows NT\Printers\PointAndPrint =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\PushNotifications =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\CredSSP\Parameters =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard =>  to 3
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeviceGuard =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Device Metadata =>  to 1
+HKLM:\SYSTEM\CurrentControlSet\Policies\EarlyLaunch =>  to 3
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2} =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Group Policy\{35378EAC-683F-11D2-A89A-00C04FBBCFA2} =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\TabletPC =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\HandwritingErrorReports =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Internet Connection Wizard =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Printers =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Registration Wizard Control =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\SearchCompanion =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Messenger\Client =>  to 2
+HKLM:\SOFTWARE\Policies\Microsoft\SQMClient\Windows =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\PCHealth\ErrorReporting =>  to 0
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\kerberos\parameters =>  to 0
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\kerberos\parameters =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Kernel DMA Protection =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Control Panel\International =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9 =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9 =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5-f7d2daa51f51 =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\0e796bdb-100d-47d6-a2d5-f7d2daa51f51 =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Rpc =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Rpc =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\ScriptedDiagnosticsProvider\Policy =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WDI\{9c5a40da-b965-4fc3-8781-88dd50a6299d} =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\W32Time\TimeProviders\NtpClient =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\W32Time\TimeProviders\NtpServer =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\CurrentVersion\AppModel\StateManager =>  to 0
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Biometrics\FacialFeatures =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Camera =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Connect =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\CredUI =>  to 1
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\CredUI =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\PreviewBuilds =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application => 20480 to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Security =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Security => 99968 to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Setup =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Setup =>  to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\System =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\System => 20480 to 4194304
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Explorer =>  to 0
+HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Messaging =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\MicrosoftAccount =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Spynet => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\ASR\Rules => 2 to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Windows Defender Exploit Guard\Network Protection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\MpEngine =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection =>  to 0
+HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection =>  to 0
+HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection =>  to 0
+HKLM:SOFTWARE\Policies\Microsoft\Windows Defender\Reporting =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Scan =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender\Scan =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\OneDrive =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\PushToInstall =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 2
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 3
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 900000
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 60000
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Internet Explorer\Feeds =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\CurrentVersion\Software Protection Platform =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\System =>  to Block
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\WindowsInkWorkspace =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\Installer =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service => 1 to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WinRM\Service\WinRS =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender Security Center\App and Browser protection =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU =>  to 0
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate =>  to 180
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate =>  to 1
+HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate =>  to 0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**********************
+Windows PowerShell transcript end
+End time: 20240517122037
+**********************

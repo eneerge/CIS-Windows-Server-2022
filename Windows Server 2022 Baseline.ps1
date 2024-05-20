@@ -162,7 +162,7 @@ $ExecutionList = @(
     "NetworkServerAlwaysDigitallySign",                                 #2.3.9.2
     # "LanManSrvEnableSecuritySignature",                                 #2.3.9.3
     # "LanManServerEnableForcedLogOff",                                   #2.3.9.4
-     "LanManServerSmbServerNameHardeningLevel",                          #2.3.9.5
+    "LanManServerSmbServerNameHardeningLevel",                          #2.3.9.5
     # "LSAAnonymousNameDisabled",                                         #2.3.10.1
     # "RestrictAnonymousSAM",                                             #2.3.10.2
     # "RestrictAnonymous",                                                #2.3.10.3
@@ -245,7 +245,7 @@ $ExecutionList = @(
     # "AuditOtherLogonLogoffEvents",                                      #17.5.5
     # "AuditSpecialLogon",                                                #17.5.6
     # "AuditDetailedFileShare",                                           #17.6.1
-    # "AuditFileShare",                                                   #17.6.2
+     "AuditFileShare",                                                   #17.6.2
      "AuditOtherObjectAccessEvents",                                     #17.6.3
     "AuditRemovableStorage",                                            #17.6.4
     # "AuditPolicyChange",                                                #17.7.1
@@ -283,7 +283,7 @@ $ExecutionList = @(
     # "ScreenSaverGracePeriod",                                           #18.4.9
     # "TcpMaxDataRetransmissionsV6",                                      #18.4.10
     # "TcpMaxDataRetransmissions",                                        #18.4.11
-    # "SecurityWarningLevel",                                             #18.4.12
+     "SecurityWarningLevel",                                             #18.4.12
     # "EnableDNSOverDoH",                                                 #18.5.4.1 (2023.01.27 - added support)
       "EnableMulticast",                                                  #18.5.4.2
     # "EnableFontProviders",                                              #18.5.5.1
@@ -421,15 +421,15 @@ $ExecutionList = @(
 
      "EnableNetworkProtection",                                          #18.9.47.5.3.1 (2023.01.27 - added to default configuration in script)
     # "EnableFileHashComputationFeature",                                 #18.9.47.6.1 (2023.01.27 - added support)
-    # "DisableIOAVProtection",                                            #18.9.47.9.1 (2023.01.27 - added support)
+     "DisableIOAVProtection",                                            #18.9.47.9.1 (2023.01.27 - added support)
     # "DisableRealtimeMonitoring",                                        #18.9.47.9.2 (2023.01.27 - added support)
     # "DisableBehaviorMonitoring",                                        #18.9.47.9.3 (2023.01.27 - added support)
-    # "DisableScriptScanning",                                            #18.9.47.9.4 (2023.01.27 - added support)
+     "DisableScriptScanning",                                            #18.9.47.9.4 (2023.01.27 - added support)
     # "DisableGenericRePorts",                                            #18.9.47.11.1 (2023.01.27 - added support)
     # "DisableRemovableDriveScanning",                                    #18.9.47.12.1 (2023.01.27 - added support)
     # "DisableEmailScanning",                                             #18.9.47.12.2 (2023.01.27 - added support)
 
-    # "PUAProtection",                                                    #18.9.47.15 (2023.02.01 - added to default configuration in script)
+    "PUAProtection",                                                    #18.9.47.15 (2023.02.01 - added to default configuration in script)
     "DisableAntiSpyware",                                               #18.9.47.16 (2023.02.01 - added to default configuration in script)
 
 
@@ -440,7 +440,7 @@ $ExecutionList = @(
 
     # "fSingleSessionPerUser",                                            #18.9.65.3.2.1 (2023.01.27 - added to default configuration)
     # "EnableUiaRedirection",                                             #18.9.65.3.3.1 (2023.01.27 - added support)
-    # "TerminalServicesfDisableCcm",                                      #18.9.65.3.3.2 (2023.01.27 - added to default configuration)
+     "TerminalServicesfDisableCcm",                                      #18.9.65.3.3.2 (2023.01.27 - added to default configuration)
      "TerminalServicesfDisableCdm",                                      #18.9.65.3.3.3 (2023.01.27 - added to default configuration)
     # "fDisableLocationRedir",                                            #18.9.65.3.3.4 (2023.01.27 - added support)
     # "TerminalServicesfDisableLPT",                                      #18.9.65.3.3.5 (2023.01.27 - added to default configuration)

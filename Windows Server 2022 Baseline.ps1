@@ -475,7 +475,7 @@ $ExecutionList = @(
     # "WinRMServiceAllowUnencryptedTraffic",                              #18.9.102.2.3 (2023.01.27 - added to default configuration)
      "WinRMServiceDisableRunAs",                                         #18.9.102.2.4 (2023.01.27 - added to default configuration)
     # "WinRSAllowRemoteShellAccess",                                      #18.9.103.1 (2023.01.27 - added to default configuration)
-    "DisallowExploitProtectionOverride",                                #18.9.105.2.1 (2023.01.27 - added to default configuration)
+    "DisallowExploitProtectionOverride"                                #18.9.105.2.1 (2023.01.27 - added to default configuration)
     # "NoAutoRebootWithLoggedOnUsers",                                    #18.9.108.1.1 (2023.01.27 - added to default configuration)
     # "ConfigureAutomaticUpdates",                                        #18.9.108.2.1 (2023.01.27 - added to default configuration)
     # "Scheduledinstallday",                                              #18.9.108.2.2 (2023.01.27 - added to default configuration)

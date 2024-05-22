@@ -3255,6 +3255,22 @@ function WindowsUpdateQuality {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" "DeferQualityUpdatesPeriodInDays" "0" $REG_DWORD
 }
 
+function New-RandomPassword {
+    param (
+        [Parameter(Mandatory=$true)]
+        [int]$Length,
+        [string]$Characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{}|;:,.<>?'
+    )
+     
+    $password = -join (1..$length | ForEach-Object { Get-Random -InputObject $characters.ToCharArray() })
+    return $password
+}
+ 
+
+
+
+
+#Read more: https://www.sharepointdiary.com/2020/04/powershell-generate-random-password.html#ixzz8aycWAdoJ
 function ValidatePasswords([string] $pass1, [string] $pass2) {
     if($pass1 -ne $pass2) { return $False }
     if($pass1 -notmatch "^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$#^!%*?&])[A-Za-z\d@$#^!%*?&]{15,}$") { return $False }
@@ -3286,6 +3302,9 @@ $temp_pass1 = ""
 $temp_pass2 = ""
 $invalid_pass = $true
 
+
+
+
 # Get input password if the admin account does not already exist
 $NewLocalAdminExists = Get-LocalUser -Name $NewLocalAdmin -ErrorAction SilentlyContinue
 if ($NewLocalAdminExists.Count -eq 0) {
@@ -3294,9 +3313,9 @@ if ($NewLocalAdminExists.Count -eq 0) {
         Write-Info "Your password must contain at least 15 characters, capital letters, numbers and symbols"
         
         Write-Info "Please enter the new password:"
-        $temp_pass1 = Read-Host
+        $temp_pass1 = New-RandomPassword -Length 16
         Write-Info "Please repeat the new password:"
-        $temp_pass2 = Read-Host 
+        $temp_pass2 = $temp_pass1
         
         $invalid_pass = ValidatePasswords $temp_pass1 $temp_pass2 
         if($invalid_pass -eq $false) {

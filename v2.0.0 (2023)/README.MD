@@ -1,6 +1,6 @@
-![alt text](https://github.com/eneerge/CIS-Windows-Server-2022/raw/main/hardening%20output.png?raw=true)
-
 # CIS V2.0.0 (2023)
+
+![alt text](https://github.com/eneerge/CIS-Windows-Server-2022/raw/main/hardening%20output.png?raw=true)
 
 # Harden Windows Server 2022 (CIS)
 This repository contains a powershell script and excel file that can be used to implement recommendations provided by the Center for Information Security (www.cisecurity.org). Both L1 and L2 configurations have been included. This benchmark is based on https://workbench.cisecurity.org/benchmarks/12626.

@@ -29,7 +29,7 @@ $EventLogMaxFileSize = 102400 # Default 100MB (for non-security logs)
 $EventLogSecurityMaxFileSize = 2097152 # Default 2GB (for Security log)
 
 # Defender log max file size doesn't appear to have any limit, but it must be a multiple of 64KB
-$WindowsDefenderLogSize = 2048MB # default of 2GB (NOTE: Value specified using MB. You can only specify it this way on this Defender setting and not the EventLog settings)
+$WindowsDefenderLogSize = 2097152 # default of 2GB
 
 # Account Names (For built in admin and guest account and a Brand New Admin Account)
 # WARNING: Built in admin account will not exist after running this script. It will be the $NewLocalAdmin specified below
@@ -44,13 +44,13 @@ $NewLocalAdmin = "User" # Active admin account username (Local admin account tha
 # Set to true to ensure implemented policy supports functionality of a particular software
 # Setting these to true will override any configurations you set in the "Policy Configuration" section below.
 #########################################################
-$AllowRDPFromLocalAccount = $true;            # CIS 2.2.27 - Set to true to oppose CIS recommendation and allow RDP from local account. This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments. (DenyRemoteDesktopServiceLogon)
-$AllowRDPClipboard = $true;                   # CIS 18.10.56.3.3.3 - Set to true to oppose CIS recommendation and allow drive redirection so that copy/paste works to RDP sessions. This enables "Drive Redirection" feature so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session. (TerminalServicesfDisableCdm)
-$AllowDefenderMAPS = $true;                   # CIS 18.10.42.5.2 - Set to true to oppose CIS recommendation and enable MAPS. CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation. (SpynetReporting)
-$AllowStoringPasswordsForTasks = $true        # CIS 2.3.10.4 - Set to true to oppose CIS recommendation and allow storing of passwords. CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible. (DisableDomainCreds)
-$AllowAccessToSMBWithDifferentSPN = $true     # CIS 2.3.9.5 - Set to true to oppose CIS recommendation and allow SMB over unknown SPN. CIS recommends setting SPN validation to "Accept if provided by client." This can cause issues if you attempt to access a share using a different DNS name than the server currently recognizes. IE: If you have a non-domain joined computer and you access it using a DNS name that the server doesn't realize points to it, then the server will reject the connection. EG: Say you connect to "myserver.company.com", but the server's local name is just "myserver" and the server has no knowledge that it is also called "myserver.company.com" then the connection will be denied. (LanManServerSmbServerNameHardeningLevel)
-$DontSetEnableLUAForVeeamBackup = $true       # CIS 2.3.17.6 - Set to true to oppose CIS recommendation and don't run all admins in Admin Approval Mode. CIS recommends setting this registry value to 1 so that all Admin users including the built in account must run in Admin Approval Mode (UAC popup always when running admin). However, this breaks Veeam Backup. See: https://www.veeam.com/kb4185
-$DontSetTokenFilterPolicyForPSExec = $true    # CIS 18.4.1 - Set to true to oppose CIS recommendation and don't set require UAC for admins logging in over a network. Highly recommended to leave this $false unless you are legitimately using PSExec for any reason on the server. In addition, EnableLUA should also be disabled. See https://www.brandonmartinez.com/2013/04/24/resolve-access-is-denied-using-psexec-with-a-local-admin-account/
+$AllowRDPFromLocalAccount = $false;            # CIS 2.2.27 - Set to true to oppose CIS recommendation and allow RDP from local account. This must be true or you will not be able to remote in using a local account. Enabling this removes local accounts from "Deny log on through Remote Desktop Services". If set to true, CIS Audit will report this as not being implemented, but you will be able to RDP using a local account which is a common requirement in most environments. (DenyRemoteDesktopServiceLogon)
+$AllowRDPClipboard = $false;                   # CIS 18.10.56.3.3.3 - Set to true to oppose CIS recommendation and allow drive redirection so that copy/paste works to RDP sessions. This enables "Drive Redirection" feature so copy and paste in an RDP is allowed. A CIS audit will report this as not being implemented, but you will be able to copy/paste into an RDP session. (TerminalServicesfDisableCdm)
+$AllowDefenderMAPS = $false;                   # CIS 18.10.42.5.2 - Set to true to oppose CIS recommendation and enable MAPS. CIS recommends disabling MAPs, but this reduces security by limiting cloud protection. Setting this true enables MAPs against the CIS recommendation. A CIS audit will report this as not being implemented, but you will receive better AV protection by going against the CIS recommendation. (SpynetReporting)
+$AllowStoringPasswordsForTasks = $false        # CIS 2.3.10.4 - Set to true to oppose CIS recommendation and allow storing of passwords. CIS recommends disabling storage of passwords. However, this also prevents storing passwords required to run local batch jobs in the task scheduler. Setting this to true will disable this config. A CIS audit will report this as not being implemented, but saving passwords will be possible. (DisableDomainCreds)
+$AllowAccessToSMBWithDifferentSPN = $false     # CIS 2.3.9.5 - Set to true to oppose CIS recommendation and allow SMB over unknown SPN. CIS recommends setting SPN validation to "Accept if provided by client." This can cause issues if you attempt to access a share using a different DNS name than the server currently recognizes. IE: If you have a non-domain joined computer and you access it using a DNS name that the server doesn't realize points to it, then the server will reject the connection. EG: Say you connect to "myserver.company.com", but the server's local name is just "myserver" and the server has no knowledge that it is also called "myserver.company.com" then the connection will be denied. (LanManServerSmbServerNameHardeningLevel)
+$DontSetEnableLUAForVeeamBackup = $false       # CIS 2.3.17.6 - Set to true to oppose CIS recommendation and don't run all admins in Admin Approval Mode. CIS recommends setting this registry value to 1 so that all Admin users including the built in account must run in Admin Approval Mode (UAC popup always when running admin). However, this breaks Veeam Backup. See: https://www.veeam.com/kb4185
+$DontSetTokenFilterPolicyForPSExec = $false    # CIS 18.4.1 - Set to true to oppose CIS recommendation and don't set require UAC for admins logging in over a network. Highly recommended to leave this $false unless you are legitimately using PSExec for any reason on the server. In addition, EnableLUA should also be disabled. See https://www.brandonmartinez.com/2013/04/24/resolve-access-is-denied-using-psexec-with-a-local-admin-account/
 
 #########################################################
 # Compatibility Assurance - Values
@@ -65,12 +65,15 @@ $DontSetTokenFilterPolicyForPSExec = $true    # CIS 18.4.1 - Set to true to oppo
 # - 2 - Enabled: Allow DoH. Use if available, otherwise failback to regular DNS
 $DnsOverHttpsInt = 2 # Default to 2 for better support. 3 was used in last configuration and caused some connectivity issues.
 
+
 # Attack Surface Reduction Exclusions (Recommended) - ASR will likely fire on legitimate software. To ensure server software runs properly, add exclusions to the executables or folders here.
 $AttackSurfaceReductionExclusions = @(
     # Examples
     #"C:\Program Files (x86)\SomeFolder"
     #"C:\Program Files (x86)\SomeFolder\somefile.exe"
 )
+
+
 
 #########################################################
 # Increase User Hardening (Optional)
@@ -174,7 +177,6 @@ $ExecutionList = @(
     "SystemShutDown",                                                   #2.2.47
                                                                         #2.2.48 Not Applicable to Member Server
     "TakeOwnershipFiles",                                               #2.2.49
-    "DisableAdministratorAccount",                                      #Removed CIS v3.0.0, but this script will still implement. IMO, not using the built-in account is more secure. Opposed.
     "DisableMicrosoftAccounts",                                         #2.3.1.1
     "DisableGuestAccount",                                              #2.3.1.2
     "LimitBlankPasswordConsole",                                        #2.3.1.3
@@ -554,7 +556,8 @@ $ExecutionList = @(
     "Scheduledinstallday",                                              #18.10.92.2.2
     "Managepreviewbuilds",                                              #18.10.92.4.1
     "WindowsUpdateFeature",                                             #18.10.92.4.2
-    "WindowsUpdateQuality"                                              #18.10.92.4.3
+    "WindowsUpdateQuality",                                             #18.10.92.4.3
+    "DisableAdministratorAccount"                                       #Removed CIS v3.0.0, but this script will still implement. IMO, not using the built-in account is more secure. Opposed.
     
     # These configurations references a user SID and are not automated in this script
     #19.1.3.1
@@ -571,6 +574,8 @@ $ExecutionList = @(
     #19.7.42.1
     #19.7.44.2.1
 )
+
+
 # End configuration
 ##########################################################################################################
 # DO NOT CHANGE CODE BELLOW THIS LINE IF YOU ARE NOT 100% SURE ABOUT WHAT YOU ARE DOING!
@@ -977,7 +982,7 @@ function AccountLockoutThreshold
     Write-Output ( net accounts | Select-String -SimpleMatch 'lockout threshold' )
 
     Write-After ("After hardening: *******                   ")
-    net accounts /lockoutthreshold:20
+    net accounts /lockoutthreshold:10
 }
 
 function AllowBuiltInAdminAccountLockout
@@ -991,11 +996,11 @@ function  ResetAccountLockoutCounter
 {
     #1.2.4 (L1) Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)' (Scored)
     Write-Info "1.2.4 (L1) Ensure 'Reset account lockout counter after' is set to '15 or more minute(s)' (Scored)"
-  Write-Before ("Before hardening: *******               ")
+    Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Lockout observation window' )
 
     Write-After ("After hardening: *******                   ")
-    net accounts /lockoutwindow:5
+    net accounts /lockoutwindow:15
 }
 
 function NoOneTrustCallerACM {
@@ -1889,13 +1894,13 @@ function PublicDisableNotifications {
 function PublicAllowLocalPolicyMerge  {
     #9.3.4 => Computer Configuration\Policies\Windows Settings\Security Settings\Windows Firewall with Advanced Security\Windows Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Settings Customize\Apply local firewall rules
     Write-Info "9.3.4 (L1) Ensure 'Windows Firewall: Public: Settings: Apply local firewall rules' is set to 'No'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile" "PublicAllowLocalPolicyMerge" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile" "AllowLocalPolicyMerge" "0" $REG_DWORD
 }
 
 function PublicAllowLocalIPsecPolicyMerge {
     #9.3.5 => Computer Configuration\Policies\Windows Settings\Security Settings\Windows Firewall with Advanced Security\Windows Firewall with Advanced Security\Windows Firewall Properties\Public Profile\Settings Customize\Apply local connection security rules 
     Write-Info "9.3.5 (L1) Ensure 'Windows Firewall: Public: Settings: Apply local connection security rules' is set to 'No'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile" "PublicAllowLocalIPsecPolicyMerge" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\WindowsFirewall\PublicProfile" "AllowLocalIPsecPolicyMerge" "0" $REG_DWORD
 }
 
 function PublicLogFilePath {
@@ -2168,7 +2173,7 @@ function WDigestUseLogonCredential   {
 function WinlogonAutoAdminLogon {
     #18.5.1 => Computer Configuration\Policies\Administrative Templates\MSS (Legacy)\MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)
     Write-Info "18.5.1 (L1) Ensure 'MSS: (AutoAdminLogon) Enable Automatic Logon (not recommended)' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" "AutoAdminLogon" "0" $REG_SZ
 }
 
 function DisableIPv6SourceRouting {
@@ -2321,8 +2326,8 @@ function StdDomainUserSetLocation {
 function HardenedPaths {
     #18.6.14.1 => Computer Configuration\Policies\Administrative Templates\Network\Network Provider\Hardened UNC Paths
     Write-Info "18.6.14.1 (L1) Ensure 'Hardened UNC Paths' is set to 'Enabled, with 'Require Mutual Authentication' and 'Require Integrity' set for all NETLOGON and SYSVOL shares"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths" "\\*\NETLOGON" "RequireMutualAuthentication=1, RequireIntegrity=1" $REG_SZ
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths" "\\*\SYSVOL" "RequireMutualAuthentication=1, RequireIntegrity=1" $REG_SZ
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths" "\\*\NETLOGON" "RequireMutualAuthentication=1, RequireIntegrity=1, RequirePrivacy=1" $REG_SZ
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\NetworkProvider\HardenedPaths" "\\*\SYSVOL" "RequireMutualAuthentication=1, RequireIntegrity=1, RequirePrivacy=1" $REG_SZ
 }
 
 function DisableIPv6DisabledComponents {
@@ -2827,7 +2832,7 @@ function DisableConsumerAccountStateContent {
 function DisableCloudOptimizedContent {
     #18.10.12.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Cloud Content\Turn off cloud optimized content
     Write-Info "18.10.12.2 (L2) Ensure 'Turn off cloud optimized content' is set to 'Enabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableConsumerAccountStateContent" "1" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableCloudOptimizedContent" "1" $REG_DWORD
 }
 
 function DisableWindowsConsumerFeatures {
@@ -2929,7 +2934,7 @@ function DisableAppinstallerMSAppProtocol {
 function EventLogRetention  {
     #18.10.25.1.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\Application\Control Event Log behavior when the log file reaches its maximum size
     Write-Info "18.10.25.1.1 (L1) Ensure 'Application: Control Event Log behavior when the log file reaches its maximum size' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application" "Retention" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Application" "Retention" "0" $REG_SZ
 }
 
 function EventLogMaxSize {
@@ -2941,7 +2946,7 @@ function EventLogMaxSize {
 function EventLogSecurityRetention {
     #18.10.25.2.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\Security\Control Event Log behavior when the log file reaches its maximum size
     Write-Info "18.10.25.2.1 (L1) Ensure 'Security: Control Event Log behavior when the log file reaches its maximum size' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Security" "Retention" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Security" "Retention" "0" $REG_SZ
 }
 
 function EventLogSecurityMaxSize {
@@ -2953,7 +2958,7 @@ function EventLogSecurityMaxSize {
 function EventLogSetupRetention {
     #18.10.25.3.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\Setup\Control Event Log behavior when the log file reaches its maximum size
     Write-Info "18.10.25.3.1 (L1) Ensure 'Setup: Control Event Log behavior when the log file reaches its maximum size' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Setup" "Retention" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\Setup" "Retention" "0" $REG_SZ
 }
 
 function EventLogSetupMaxSize {
@@ -2965,7 +2970,7 @@ function EventLogSetupMaxSize {
 function EventLogSystemRetention {
     #18.10.25.4.1 => Computer Configuration\Policies\Administrative Templates\Windows Components\Event Log Service\System\Control Event Log behavior when the log file reaches its maximum size
     Write-Info "18.10.25.4.1 (L1) Ensure 'System: Control Event Log behavior when the log file reaches its maximum size' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\System" "Retention" "0" $REG_DWORD
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\EventLog\System" "Retention" "0" $REG_SZ
 }
 
 function EventLogSystemMaxSize {
@@ -3405,8 +3410,8 @@ function EnableScriptBlockLogging {
 
 function EnableTranscripting {
     #18.10.86.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Windows PowerShell\Turn on PowerShell Transcription 
-    Write-Info "18.10.86.2 (L1) Ensure 'Turn on PowerShell Transcription' is set to 'Disabled'"
-    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription" "EnableTranscripting" "0" $REG_DWORD
+    Write-Info "18.10.86.2 (L1) Ensure 'Turn on PowerShell Transcription' is set to 'Enabled'"
+    SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription" "EnableTranscripting" "1" $REG_DWORD
 }
 
 function WinRMClientAllowBasic  {

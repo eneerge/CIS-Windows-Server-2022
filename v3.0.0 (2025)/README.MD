@@ -13,16 +13,17 @@ This repository contains a powershell script and excel file that can be used to 
 Spreadsheet contains all CIS Recommendations without modifications. Some items require further admin setup (EG: LAPS) and have been noted.
 
 # Powershell Script
-Script is provided that implements all configurations (L1 and L2). Each configuration can be easily commented out if not required. Please review the spreadsheet to see if any additional setup is required for any particular configuration.
+Script is provided that implements all configurations (L1, L2, NG). Each configuration can be easily commented out if not required. Please review the spreadsheet to see if any additional setup is required for any particular configuration.
 
 Please note that you do NOT have to configure anything and you can simply run as is if you're just looking to quickly harden your machine. I have provided hardened defaults. However, you should at least review the compatibility assurance options to make sure you don't break anything.
 
 ## Basic Configuration Variables
-- `$LogonLegalNoticeMessageTitle` (Optional)
-- `$LogonLegalNoticeMessage` (Optional)
-- `$WindowsFirewallLogSize` (defaults to 4gb)
-- `$EventLogMaxFileSize` (defaults to 4gb)
-- `$WindowsDefenderLogSize` (defaults to 1gb)18.3.1
+- `$LogonLegalNoticeMessageTitle`
+- `$LogonLegalNoticeMessage`
+- `$WindowsFirewallLogSize` (defaults to 32MB, the max)
+- `$EventLogMaxFileSize` (defaults to 100MB)
+- `$EventLogSecurityMaxFileSize` (defaults to 2GB)
+- `$WindowsDefenderLogSize` (defaults to 2gb)
 
 ## Admin and Guest User Name Prefixes
 - `$AdminAccountPrefix` 
@@ -57,26 +58,42 @@ To reduce the risk of breaking any functionality on your server, compatibility a
   - This alters the LocalAccountTokenFilterPolicy so that PSExec can run on the machine
   - Leave this set to $false unless you use PSExec. PSExec is often times used illegitimately and leaving this enabled increases risk.
 
-## Extra Hardening Options
-- `$AdditionalUsersToDenyNetworkAccess` 
-  - By default, the script denies CIS recommend users from accessing the server over the network. If you would like to restrict even more users, you can provide them here.
-
-- `$AdditionalUsersToDenyRemoteDesktopServiceLogon`
-  - Similar to the above option, deny additional users who should not be able to RDP into the server.
-
-- `$AdditionalUsersToDenyLocalLogon`
-  - Similar to above, deny users who can log on locally. Good idea to include users that are used for only batch jobs who do not need to login to the machine directly.
-
+- `$DnsOverHttpsInt`
+  - This sets the DNS-Over-Https setting which routes all DNS traffic (normally port 53) over https (443). DNS-Over-Https is better for privacy, but it could affect connectivity. By default, the script will prefer DNS-Over-Https, but will fallback to regular DNS if connection issues occur. This is the recommended CIS setting.
+  - 2 (default) prefers DOH, but allows regular DNS  
+  - 3 Forces Dns-Over-Https
+  
 ## Attack Surface Reduction Exclusions
-This script enables all Attack Surface Reduction rules - even those that CIS has not included in their recommendation, yet. For example, the "Block software that does not meet a prevalence". This greatly increases the hardening of the system, but it also greatly increases the risk of false positives. Simply updating php to a new version could potentially cause a web server to no longer work due to the latest version of PHP not being known by Microsoft, yet. (This happened to me). You can specify known software here to ensure ASR does not block them.
+This script enables all Attack Surface Reduction rules - even those that CIS has not included in their recommendation, yet. For example, the "Block software that does not meet a prevalence". This greatly increases the hardening of the system, but it also greatly increases the risk of false positives. Simply updating php to a new version could potentially cause a web server to no longer work due to the latest version of PHP not being known by Microsoft, yet. You can specify known software here to ensure ASR does not block them.
 `$AttackSurfaceReductionExclusions`
 - Simply enter the path to a folder OR an executable to exclude from ASR detection.
 - **Caution:** Highly recommend you only enter folders and executables that have been installed into a path that can't be altered by a non-admin. 
   - EG: C:\Program Files\Some Software"
   - If you enter a path that's easily manipulated by a user, malware could easily overwrite that executable and then bypass your ASR rules.
 
+## Extra Hardening Options
+- `$AdditionalUsersToDenyNetworkAccess` 
+  - By default, the script denies users or groups from accessing the server over the network as defined by CIS recommendations. If you would like to restrict even more users, you can provide them here.
+
+- `$AdditionalUsersToDenyRemoteDesktopServiceLogon`
+  - Similar to the above option, deny additional users or groups who should not be able to RDP into the server.
+
+- `$AdditionalUsersToDenyLocalLogon`
+  - Similar to above, deny users or groups who can log on locally. Good idea to include users that are used for only batch jobs who do not need to login to the machine directly.
+
 ## Add/Remove Specific CIS Configurations
-If a compatibility assurance option is not available for your particular need, you can comment out any policy called by the $ExecutionList by placing a # in front of the policy option.
+If a compatibility assurance option is not available for your particular need, you can comment out any policy called by the $ExecutionList by placing a # in front of the policy option. 
+
+I recommend browsing each configuration option and commenting out any setting that appears could cause issues in your environment. When implementing for the first time, you can comment out every line and bring each setting in slowly to ensure everything still works on the server.
+
+Note: This script does not reverse any settings when commenting out a configuration. You will need to manually reverse (or simply restore your VM snapshot) to revert back.
+My recommended way of implementing:
+1. Fresh OS install (not required)
+2. Snapshot/Checkpoint the Virtual Machine
+3. Apply script
+4. Test
+5. (If necessary) Revert to previous snapshot
+6. Repeat until you have a working configuration
 
 ## Run It - First Time
 After configuring the above options, open an admin powershell (64-bit) window and run the script.
@@ -94,14 +111,25 @@ The script produces the following logs. The logs are written to the location the
 - PolicyResults.txt - This records the entire results of each CIS setting with each having a "Before" and "After" so that you can see how the script affected your configuration. If a setting was changed "Value changed" will be reported in the output so that you can easily search through the log to locate any settings that changed. The same changes are also reported in PolicyChangesMade.txt.
 
 # Validation
-2025.02.06 Validations will occur later this month.
+2025.02.22 There have been 5 audits conducted against these settings. All settings, except for LAPS-related configurations have been implemented. Audit 6, intended to be the final audit, should validate the final 2 settings that were missing from Audit 5. Full audit results are provided. Audits were conducted using the audit files from Tenable Windows Server 2022 CIS v3.0.0 L1, L2, and NG.
 
 #### Audits Failed
+Only LAPS related configurations are not set. The intention of this script is to be run against a non-AD environment, so LAPS is not usually an option for non-AD/non-intune.
 | CIS Section | CIS Description | Notes |
 | :---------- | :-------------- | :---- |
+| 18.9.25.1   | (L1) Ensure 'Configure password backup directory' is set to 'Enabled: Active Directory' or 'Enabled: Azure Active Directory | This is a LAPs setting which this script doesn't implement since it's mainly for non-AD servers.
+| 18.9.25.2 | (L1) Ensure 'Do not allow password expiration time longer than required by policy' is set to 'Enabled' | LAPS related
+| 18.9.25.3 | (L1) Ensure 'Enable password encryption' is set to 'Enabled' | LAPS related
+| 18.9.25.4 | (L1) Ensure 'Password Settings: Password Complexity' is set to 'Enabled: Large letters + small letters + numbers + special characters' | LAPS related
+| 18.9.25.5 | (L1) Ensure 'Password Settings: Password Length' is set to 'Enabled: 15 or more' | LAPS related
+| 18.9.25.6 | (L1) Ensure 'Password Settings: Password Age (Days)' is set to 'Enabled: 30 or fewer' | LAPS related
+| 18.9.25.7 | (L1) Ensure 'Post-authentication actions: Grace period (hours)' is set to 'Enabled: 8 or fewer hours, but not 0' | LAPS related
+| 18.9.25.8 | (L1) Ensure 'Post-authentication actions: Actions' is set to 'Enabled: Reset the password and logoff the managed account' or higher | LAPS related
+
+All other configurations passed.
 
 # Notes
-Windows Server on-premise machines can not currently be managed by Intune. If you have removed all Active Directory components from your environment as I have, one solution to ensure servers adhere to a baseline is to run a script to apply all of the configurations.
+Windows Server on-premise machines can not currently be managed by Intune. If you have removed all Active Directory components from your environment, one solution to ensure servers adhere to a baseline is to run a script to apply all of the configurations.
 
 # Credits
 The prelimb of this script was Windows Server 2019 CIS script that I originally downloaded from @viniciusmiguel repository at https://github.com/viniciusmiguel . The original script is no longer available.

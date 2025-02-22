@@ -38,7 +38,6 @@ $GuestAccountPrefix = "DisabledUserSec" # Built-in guest account prefix. Numbers
 $NewLocalAdmin = "User" # Active admin account username (Local admin account that will be used to manage the server. Account will be active after script is run. This is not a prefix. It's the full account username).
 
 
-
 #########################################################
 # Compatibility Assurance - Booleans
 # Set to true to ensure implemented policy supports functionality of a particular software
@@ -109,9 +108,21 @@ $AdditionalUsersToAllowAccessComputerFromNetwork = @(
 # Note that the "Compatibility Assurance" section you configured above will override your settings below to ensure compatibility
 #########################################################
 $ExecutionList = @(
-    "CreateASRExclusions"                                               # This deletes and readds the attack surface reduction exclusions configured in the script.
-    "SetWindowsDefenderLogSize"                                         # Sets the defender log size as configured in the top of this script
+    "CreateASRExclusions",                                               # This deletes and readds the attack surface reduction exclusions configured in the script.
+    "SetWindowsDefenderLogSize",                                         # Sets the defender log size as configured in the top of this script
     #KEEP THESE IN THE BEGINING
+    "TurnOffToastNotificationsOnLockscreen",                            #19.5.1.1
+    "TurnOffHelpExperienceImprovementProgram",                          #19.6.6.1.1
+    "PreserveTimeZoneInformation",                                      #19.7.5.1
+    "NotifyAntivirusWhenOpeningAttachments",                            #19.7.5.2
+    "DisableSpotlightOnLockScreen",                                     #19.7.8.1
+    "DisableThirdPartyContentInWindowsSpotlight",                       #19.7.8.2
+    "DisableTailoredExperiencesWithDiagnosticData",                     #19.7.8.3
+    "DisableWindowsSpotlightFeatures",                                  #19.7.8.4
+    "DisableSpotlightCollectionOnDesktop",                              #19.7.8.5
+    "UserAlwaysInstallElevated",                                        #19.7.42.1
+    "UserPreventCodecDownload",                                         #19.7.44.2.1
+
     "CreateNewLocalAdminAccount",                                       #Mandatory otherwise the system access is lost
     "RenameAdministratorAccount",                                       #2.3.1.4 
     "RenameGuestAccount",                                               #2.3.1.5
@@ -288,8 +299,8 @@ $ExecutionList = @(
     "AuditUserAccountManagement",                                       #17.2.6
     "AuditPNPActivity",                                                 #17.3.1
     "AuditProcessCreation",                                             #17.3.2
-    #17.4.1 Not Applicable to Member Server
-    #17.4.2 Not Applicable to Member Server
+                                                                        #17.4.1 Not Applicable to Member Server
+                                                                        #17.4.2 Not Applicable to Member Server
     "AuditAccountLockout",                                              #17.5.1
     "AuditGroupMembership",                                             #17.5.2
     "AuditLogoff",                                                      #17.5.3
@@ -557,22 +568,8 @@ $ExecutionList = @(
     "Managepreviewbuilds",                                              #18.10.92.4.1
     "WindowsUpdateFeature",                                             #18.10.92.4.2
     "WindowsUpdateQuality",                                             #18.10.92.4.3
-    "DisableAdministratorAccount"                                       #Removed CIS v3.0.0, but this script will still implement. IMO, not using the built-in account is more secure. Opposed.
     
-    # These configurations references a user SID and are not automated in this script
-    #19.1.3.1
-    #19.5.1.1
-    #19.6.6.1.1
-    #19.7.5.1
-    #19.7.5.2
-    #19.7.8.1
-    #19.7.8.2
-    #19.7.8.3
-    #19.7.8.4
-    #19.7.8.5
-    #19.7.28.1
-    #19.7.42.1
-    #19.7.44.2.1
+    "DisableAdministratorAccount"                                      #Removed CIS v3.0.0, but this script will still implement. IMO, not using the built-in account is more secure. Opposed.
 )
 
 
@@ -580,6 +577,8 @@ $ExecutionList = @(
 ##########################################################################################################
 # DO NOT CHANGE CODE BELLOW THIS LINE IF YOU ARE NOT 100% SURE ABOUT WHAT YOU ARE DOING!
 ##########################################################################################################
+$global:CreatedNewAdmin = $false
+New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS -ErrorAction SilentlyContinue
 
 # Ensure the additional users specified for settings exist to prevent issues with applying policy
 $existingUsers = (Get-LocalUser).Name
@@ -614,6 +613,7 @@ $SID_SERVICE = "*S-1-5-6"
 $SID_NETWORK_SERVICE = "*S-1-5-20"
 $SID_LOCAL_SERVICE = "*S-1-5-19"
 $SID_LOCAL_ACCOUNT = "*S-1-5-113"
+$SID_LOCAL_ACCOUNT_ADMIN = "*S-1-5-114"
 $SID_WINDOW_MANAGER_GROUP = "*S-1-5-90-0"
 $SID_REMOTE_DESKTOP_USERS = "*S-1-5-32-555"
 $SID_VIRTUAL_MACHINE = "*S-1-5-83-0"
@@ -671,6 +671,16 @@ function RegKeyExists([string] $path) {
   $?
 }
 
+function LoadRegHive([string] $path, [string] $hklmLocation) {
+    reg.exe load "HKLM\$($hklmLocation)" $path
+}
+
+function UnloadRegHive([string] $hklmLocation) {
+    [gc]::collect()
+    Start-Sleep -Seconds 2
+    reg.exe unload "HKLM\$($hklmLocation)"
+}
+
 function SetRegistry([string] $path, [string] $key, [string] $value, [string] $keytype) {
   # Sets the specified registry value at the specified registry path to the specified value.
   # First the original value is read and print to the console.
@@ -699,7 +709,9 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
     
     if ($keyExists -eq $false) {
       Write-Info "Creating registry key '$($path)'."
-      New-Item $path -Force -ErrorAction SilentlyContinue
+      $result = New-Item $path -Force -ErrorAction SilentlyContinue
+
+      $result.Handle.Close() 
       CheckError $? "Creating registry key '$($path)' failed."
     }
   }
@@ -716,6 +728,34 @@ function SetRegistry([string] $path, [string] $key, [string] $value, [string] $k
         $global:valueChanges += "$path => $($before.$key) to $($after.$key)"
     }
 }
+function SetEachUserRegistry([string] $subPath, [string] $key, [string] $value, [string] $keytype) {
+    # Get a list of all user profiles and their SID
+    $profiles = gci -recurse "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\ProfileList"
+    
+    # Loop through each profile
+    foreach ($p in $profiles) {
+        
+        # Hive loaded (user logged in), set values directly using HKU
+        if (test-path "HKU:\$($p.PSChildName)") {
+            SetRegistry "HKU:\$($p.PSChildName)\$($subPath)" $key $value $keytype
+        }
+        # Hive not loaded, load the hive and then set the value
+        else {
+            if ($p.GetValue("ProfileImagePath") -like "C:\Users*") {
+                # Hive path should be C:\User\Username\ntuser.dat
+                $profileImagePath = "$($p.GetValue("ProfileImagePath"))\ntuser.dat"
+                
+                # Make sure hive exists
+                if (test-path $profileImagePath) {
+                    LoadRegHive -hklmLocation TempUserHive -path $profileImagePath
+                    SetRegistry "HKLM:\TempUserHive\$($subPath)" $key $value $keytype
+                    UnloadRegHive -hklmLocation TempUserHive
+                }
+            }
+        }
+    }
+}
+
 
 function DeleteRegistryValue([string] $path, [string] $key) {
   $before = Get-ItemProperty -Path $path -Name $key -ErrorAction SilentlyContinue
@@ -890,13 +930,14 @@ function CreateUserAccount([string] $username, [securestring] $password, [bool] 
 
 function CreateNewLocalAdminAccount {
     CreateUserAccount $NewLocalAdmin $NewLocalAdminPassword $true
+    $global:CreatedNewAdmin = $true
 }
 
 function EnforcePasswordHistory
 {
     #1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Scored)
     Write-Info "1.1.1 (L1) Ensure 'Enforce password history' is set to '24 or more password(s)' (Scored)"
-  Write-Before ("Before hardening: *******               ")
+    Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'Length of password history maintained' )
     Write-After ("After hardening: *******                   ")
     net accounts /uniquepw:24
@@ -977,12 +1018,12 @@ function AccountLockoutDuration
 function AccountLockoutThreshold
 {
     #1.2.2 (L1) Ensure 'Account lockout threshold' is set to '10 or fewer invalid logon attempt(s), but not 0' (Scored)
-    Write-Info "1.2.2 (L1) Ensure 'Account lockout threshold' is set to '10 or fewer invalid logon attempt(s), but not 0' (Scored)"
+    Write-Info "1.2.2 (L1) Ensure 'Account lockout threshold' is set to '5 or fewer invalid logon attempt(s), but not 0' (Scored)"
     Write-Before ("Before hardening: *******               ")
     Write-Output ( net accounts | Select-String -SimpleMatch 'lockout threshold' )
 
     Write-After ("After hardening: *******                   ")
-    net accounts /lockoutthreshold:10
+    net accounts /lockoutthreshold:5
 }
 
 function AllowBuiltInAdminAccountLockout
@@ -1110,7 +1151,7 @@ function DebugPrograms {
 
 function DenyNetworkAccess {
     #2.2.22 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\User Rights Assignment\Deny access to this computer from the network
-    Write-Info "2.2.22 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests, Local account, and member of Administrators group'"
+    Write-Info "2.2.22 (L1) Ensure 'Deny access to this computer from the network' to include 'Guests, Local account and member of Administrators group'"
 
     $addlDenyUsers = ""
     if ($AdditionalUsersToDenyNetworkAccess.Count -gt 0) {
@@ -1121,7 +1162,7 @@ function DenyNetworkAccess {
         SetUserRight "SeDenyNetworkLogonRight" ($($global:AdminNewAccountName),$addlDenyUsers,$($SID_GUESTS))
     }
     else {
-        SetUserRight "SeDenyNetworkLogonRight" ($($global:AdminNewAccountName),$addlDenyUsers,$SID_LOCAL_ACCOUNT,$($SID_GUESTS))
+        SetUserRight "SeDenyNetworkLogonRight" ($($global:AdminNewAccountName),$addlDenyUsers,$SID_LOCAL_ACCOUNT_ADMIN,$($SID_GUESTS))
     }
 }
 
@@ -3506,6 +3547,138 @@ function WindowsUpdateQuality {
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" "DeferQualityUpdatesPeriodInDays" "0" $REG_DWORD
 }
 
+function TurnOffToastNotificationsOnLockscreen {
+    #19.5.1.1 => User Configuration\Policies\Administrative Templates\Start Menu and Taskbar\Notifications\Turn off toast notifications on the lock screen
+    Write-Info "19.5.1.1 (L1) Ensure 'Turn off toast notifications on the lock screen' is set to 'Enabled'"
+
+    # Load the default user hive and make sure any new users carry the setting
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" "NoToastApplicationNotificationOnLockScreen" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Windows\CurrentVersion\PushNotifications" "NoToastApplicationNotificationOnLockScreen" "1" $REG_DWORD
+}
+
+function TurnOffHelpExperienceImprovementProgram {
+    #19.6.6.1.1 => User Configuration\Policies\Administrative Templates\Start Menu and Taskbar\Notifications\Turn off toast notifications on the lock screen
+    Write-Info "19.6.6.1.1 (L2) Ensure 'Turn off Help Experience Improvement Program' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Assistance\Client\1.0" "NoImplicitFeedback" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Assistance\Client\1.0" "NoImplicitFeedback" "1" $REG_DWORD
+}
+function PreserveTimeZoneInformation {
+    #19.7.5.1 => User Configuration\Policies\Administrative Templates\Windows Components\Attachment Manager\Do not preserve zone information in file attachments
+    Write-Info "19.7.5.1 (L1) Ensure 'Do not preserve zone information in file attachments' is set to 'Disabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" "SaveZoneInformation" "2" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" "SaveZoneInformation" "2" $REG_DWORD
+}
+
+function NotifyAntivirusWhenOpeningAttachments {
+    #19.7.5.2 => User Configuration\Policies\Administrative Templates\Windows Components\Attachment Manager\Notify antivirus programs when opening attachments
+    Write-Info "19.7.5.2 (L1) Ensure 'Notify antivirus programs when opening attachments' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" "ScanWithAntiVirus" "3" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Microsoft\Windows\CurrentVersion\Policies\Attachments" "ScanWithAntiVirus" "3" $REG_DWORD
+}
+
+function DisableSpotlightOnLockScreen {
+    #19.7.8.1 => User Configuration\Policies\Administrative Templates\Windows Components\Cloud Content\Configure Windows spotlight on lock screen
+    Write-Info "19.7.8.1 (L1) Ensure 'Configure Windows spotlight on lock screen' is set to 'Disabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CloudContent" "ConfigureWindowsSpotlight" "2" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Windows\CloudContent" "ConfigureWindowsSpotlight" "2" $REG_DWORD
+}
+
+function DisableThirdPartyContentInWindowsSpotlight {
+    #19.7.8.2 => User Configuration\Policies\Administrative Templates\Windows Components\Cloud Content\Do not suggest third-party content in Windows spotlight
+    Write-Info "19.7.8.2 (L1) Ensure 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CloudContent:DisableThirdPartySuggestions" "DisableThirdPartySuggestions" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Windows\CloudContent" "DisableThirdPartySuggestions" "1" $REG_DWORD
+}
+
+function DisableTailoredExperiencesWithDiagnosticData {
+    #19.7.8.3 => User Configuration\Policies\Administrative Templates\Windows Components\Cloud Content\Do not use diagnostic data for tailored experiences
+    Write-Info "19.7.8.3 (L2) Ensure 'Do not use diagnostic data for tailored experiences' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CloudContent" "DisableTailoredExperiencesWithDiagnosticData" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Windows\CloudContent" "DisableTailoredExperiencesWithDiagnosticData" "1" $REG_DWORD
+}
+
+function  DisableWindowsSpotlightFeatures {
+    #19.7.8.4 => User Configuration\Policies\Administrative Templates\Windows Components\Cloud Content\Turn off all Windows spotlight features
+    Write-Info "19.7.8.4 (L2) Ensure 'Turn off all Windows spotlight features' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CloudContent" "DisableWindowsSpotlightFeatures" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Windows\CloudContent" "DisableWindowsSpotlightFeatures" "1" $REG_DWORD
+}
+
+function DisableSpotlightCollectionOnDesktop {
+    #19.7.8.5 => User Configuration\Policies\Administrative Templates\Windows Components\Cloud Content\Turn off Spotlight collection on Desktop
+    Write-Info "19.7.8.5 (L1) Ensure 'Turn off Spotlight collection on Desktop' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableSpotlightCollectionOnDesktop" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableSpotlightCollectionOnDesktop" "1" $REG_DWORD
+}
+
+function UserAlwaysInstallElevated {
+    #19.7.42.1 => User Configuration\Policies\Administrative Templates\Windows Components\Windows Installer\Always install with elevated privileges
+    Write-Info "19.7.42.1 (L1) Ensure 'Always install with elevated privileges' is set to 'Disabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\Installer" "AlwaysInstallElevated" "0" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\Windows\Installer" "AlwaysInstallElevated" "0" $REG_DWORD
+}
+
+function UserPreventCodecDownload {
+    #19.7.44.2.1 => User Configuration\Policies\Administrative Templates\Windows Components\Windows Media Player\Playback\Prevent Codec Download
+    Write-Info "19.7.44.2.1 (L2) Ensure 'Prevent Codec Download' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\WindowsMediaPlayer" "PreventCodecDownload" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Policies\Microsoft\WindowsMediaPlayer" "PreventCodecDownload" "1" $REG_DWORD
+}
+
 #####################################################################################################
 #####################################################################################################
 #####################################################################################################
@@ -3549,9 +3722,12 @@ if ($NewLocalAdminExists.Count -eq 0) {
         Write-Info "Your password must contain at least 15 characters, capital letters, numbers and symbols"
         
         Write-Info "Please enter the new password:"
-        $temp_pass1 = Read-Host
+        $secure_temp_pass1 = Read-Host -AsSecureString -Prompt "Please enter the new password for the new admin account ($($NewLocalAdmin)):"
+        $temp_pass1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure_temp_pass1))
+
         Write-Info "Please repeat the new password:"
-        $temp_pass2 = Read-Host 
+        $secure_temp_pass2 = Read-Host -AsSecureString -Prompt "Confirm new password:"
+        $temp_pass2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secure_temp_pass2))
         
         $invalid_pass = ValidatePasswords $temp_pass1 $temp_pass2 
         if($invalid_pass -eq $false) {
@@ -3582,12 +3758,18 @@ Write-After "Changes Made"
 Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 Write-Red ($global:valueChanges -join "`n")
 Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-Stop-Transcript 
 
 secedit /export /cfg $location\secedit_final.cfg | out-null
 
 Write-Host "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 Write-After "Completed. Logs written to: $location"
+
+if ($global:CreatedNewAdmin -eq $true) {
+    Write-Host "A new local admin account ($($NewLocalAdmin)) was created using the password you entered previously. The computer needs to reboot now to ensure integrity of the system."
+    pause
+    shutdown /r /t 0
+}
+Stop-Transcript 
     
 
 $host.UI.RawUI.ForegroundColor = $fc

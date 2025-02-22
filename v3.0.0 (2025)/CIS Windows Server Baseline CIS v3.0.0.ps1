@@ -120,6 +120,7 @@ $ExecutionList = @(
     "DisableTailoredExperiencesWithDiagnosticData",                     #19.7.8.3
     "DisableWindowsSpotlightFeatures",                                  #19.7.8.4
     "DisableSpotlightCollectionOnDesktop",                              #19.7.8.5
+    "UserNoInplaceSharing",                                             #19.7.26.1
     "UserAlwaysInstallElevated",                                        #19.7.42.1
     "UserPreventCodecDownload",                                         #19.7.44.2.1
 
@@ -1721,13 +1722,13 @@ function NTLMMinServerSec {
 function NTLMEnableIncomingAuditingForAllAccounts {
     #2.3.11.11 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Restrict NTLM: Audit Incoming NTLM Traffic
     Write-Info "2.3.11.11 (L1) Ensure 'Network security: Restrict NTLM: Audit Incoming NTLM Traffic' is set to 'Enable auditing for all accounts'"
-    SetSecurityPolicy "MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0\AuditReceivingNTLMTraffic" (,"4,2")
+    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\AuditReceivingNTLMTraffic" (,"4,2")
 }
 
 function NTLMEnableOutgoingAuditingForAllAccounts {
     #2.3.11.13 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers' is set to 'Audit all' or higher
     Write-Info "2.3.11.13 (L1) Ensure 'Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers' is set to 'Audit all' or higher"
-    SetSecurityPolicy "MACHINE\SYSTEM\CurrentControlSet\Control\Lsa\MSV1_0\RestrictSendingNTLMTraffic" (,"4,2")
+    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\RestrictSendingNTLMTraffic" (,"4,2")
 }
 
 function ShutdownWithoutLogon {
@@ -3612,7 +3613,7 @@ function DisableThirdPartyContentInWindowsSpotlight {
     Write-Info "19.7.8.2 (L1) Ensure 'Do not suggest third-party content in Windows spotlight' is set to 'Enabled'"
 
     LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
-    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CloudContent:DisableThirdPartySuggestions" "DisableThirdPartySuggestions" "1" $REG_DWORD
+    SetRegistry "HKLM:\DefaultUser\Software\Policies\Microsoft\Windows\CloudContent" "DisableThirdPartySuggestions" "1" $REG_DWORD
     UnloadRegHive -hklmLocation DefaultUser
     
     # Set all existing users registry values
@@ -3653,6 +3654,18 @@ function DisableSpotlightCollectionOnDesktop {
     
     # Set all existing users registry values
     SetEachUserRegistry "SOFTWARE\Policies\Microsoft\Windows\CloudContent" "DisableSpotlightCollectionOnDesktop" "1" $REG_DWORD
+}
+
+function UserNoInplaceSharing {
+    #19.7.26.1 => User Configuration\Policies\Administrative Templates\Windows Components\Network Sharing\Prevent users from sharing files within their profile.
+    Write-Info "19.7.26.1 (L1) Ensure 'Prevent users from sharing files within their profile.' is set to 'Enabled'"
+
+    LoadRegHive -hklmLocation DefaultUser -path C:\users\default\NTUSER.DAT
+    SetRegistry "HKLM:\DefaultUser\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoInplaceSharing" "1" $REG_DWORD
+    UnloadRegHive -hklmLocation DefaultUser
+    
+    # Set all existing users registry values
+    SetEachUserRegistry "Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" "NoInplaceSharing" "1" $REG_DWORD
 }
 
 function UserAlwaysInstallElevated {

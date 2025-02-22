@@ -2,10 +2,6 @@
 
 ![alt text](https://github.com/eneerge/CIS-Windows-Server-2022/raw/main/hardening%20output.png?raw=true)
 
------------
-(In progress)
------------
-
 # Harden Windows Server 2022 (CIS)
 This repository contains a powershell script and excel file that can be used to implement recommendations provided by the Center for Information Security (www.cisecurity.org). Both L1 and L2 configurations have been included. This is based on the following benchmark: https://workbench.cisecurity.org/benchmarks/16913
 
@@ -110,8 +106,8 @@ The script produces the following logs. The logs are written to the location the
 - PolicyChangesMade.txt - This records all of the changes that the script applied. It only records what changed and not what the script was configured to change. IE: If you already had a CIS setting in place, it will not record that change - only the CIS settings this script altered.
 - PolicyResults.txt - This records the entire results of each CIS setting with each having a "Before" and "After" so that you can see how the script affected your configuration. If a setting was changed "Value changed" will be reported in the output so that you can easily search through the log to locate any settings that changed. The same changes are also reported in PolicyChangesMade.txt.
 
-# Validation
-2025.02.22 There have been 5 audits conducted against these settings. All settings, except for LAPS-related configurations have been implemented. Audit 6, intended to be the final audit, should validate the final 2 settings that were missing from Audit 5. Full audit results are provided. Audits were conducted using the audit files from Tenable Windows Server 2022 CIS v3.0.0 L1, L2, and NG.
+# Validation/Audit Results
+2025.02.22 All settings, except for LAPS-related configurations have been implemented. Full audit results are provided. Audits were conducted using the audit files from Tenable Windows Server 2022 CIS v3.0.0 L1, L2, and NG.
 
 #### Audits Failed
 Only LAPS related configurations are not set. The intention of this script is to be run against a non-AD environment, so LAPS is not usually an option for non-AD/non-intune.

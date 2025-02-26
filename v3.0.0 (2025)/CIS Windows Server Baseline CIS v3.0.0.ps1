@@ -3268,8 +3268,8 @@ function EnableUiaRedirection {
 }
 
 function TerminalServicesfDisableCcm {
-    #18.10.56.3.32 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow COM port redirection
-    Write-Info "18.10.56.3.32 (L2) Ensure 'Do not allow COM port redirection' is set to 'Enabled'"
+    #18.10.56.3.3.2 => Computer Configuration\Policies\Administrative Templates\Windows Components\Remote Desktop Services\Remote Desktop Session Host\Device and Resource Redirection\Do not allow COM port redirection
+    Write-Info "18.10.56.3.3.2 (L2) Ensure 'Do not allow COM port redirection' is set to 'Enabled'"
     SetRegistry "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" "fDisableCcm" "1" $REG_DWORD
 }
 

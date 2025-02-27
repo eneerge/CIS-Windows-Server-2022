@@ -924,14 +924,13 @@ function CreateUserAccount([string] $username, [securestring] $password, [bool] 
             Add-LocalGroupMember -Group "Administrators" -Member $username
             Write-Info "Administrator account $($username) is now member of the local Administrators group."
         }
-
+        $global:CreatedNewAdmin = $true
         $global:rebootRequired = $true
     }
 }
 
 function CreateNewLocalAdminAccount {
     CreateUserAccount $NewLocalAdmin $NewLocalAdminPassword $true
-    $global:CreatedNewAdmin = $true
 }
 
 function EnforcePasswordHistory

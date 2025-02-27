@@ -1728,7 +1728,7 @@ function NTLMEnableIncomingAuditingForAllAccounts {
 function NTLMEnableOutgoingAuditingForAllAccounts {
     #2.3.11.13 => Computer Configuration\Policies\Windows Settings\Security Settings\Local Policies\Security Options\Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers' is set to 'Audit all' or higher
     Write-Info "2.3.11.13 (L1) Ensure 'Network security: Restrict NTLM: Outgoing NTLM traffic to remote servers' is set to 'Audit all' or higher"
-    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\RestrictSendingNTLMTraffic" (,"4,2")
+    SetSecurityPolicy "MACHINE\System\CurrentControlSet\Control\Lsa\MSV1_0\RestrictSendingNTLMTraffic" (,"4,1")
 }
 
 function ShutdownWithoutLogon {

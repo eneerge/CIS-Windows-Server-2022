@@ -1,5 +1,5 @@
 # Harden Windows Server 2022 (CIS)
-This repository contains resources for implementing recommendations provided by the Center for Information Security (www.cisecurity.org)
+This repository contains resources for implementing recommendations provided by the Center for Internet Security (www.cisecurity.org)
 
 ![alt text](https://github.com/eneerge/CIS-Windows-Server-2022/raw/main/hardening%20output.png?raw=true)
 
